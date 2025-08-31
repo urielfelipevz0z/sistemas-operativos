@@ -1,0 +1,5 @@
+MOV Ax, 10
+ADD Ex, 5
+SUB Bx 3
+MUL Cx, abc
+INVALID Dx, 1

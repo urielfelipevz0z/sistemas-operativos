@@ -1,0 +1,10 @@
+MOV Ax, 10
+ADD Bx, 5
+SUB Cx, 3
+MUL Dx, 2
+MOV Bx, 8
+DIV Ax, 2
+INC Cx
+DEC Dx
+ADD Ax, 15
+DIV Bx, 0
