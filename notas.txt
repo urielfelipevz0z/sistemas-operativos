@@ -1,0 +1,64 @@
+a.asm -> contendra instrucciones (Serán los procesos que ejecute nuestro sistema operativo)
+
+    instruccion 1
+    instruccion 2
+    ...
+    instruccion n
+
+   Ejemplos de instrucciones:
+        MOV -> Asignación
+        ADD -> Suma
+        SUB -> Resta
+        MUL -> Multiplicación
+        DIV -> División
+        INC -> Incremento
+        DEC -> Decremento
+
+Asi se verá el archivo de instruccione que leera el programa:
+    MOV Ax, 5       //Ax=5
+    ADD Bx, 7       //Bx=Bx+7
+    SUB Cx, 4       //Cx=Cx-4
+    MUL Dx, 2       //Dx=Dx*4
+    DIV Ax, 2       //Ax=Ax/2
+    INC Bx          //Bx=Bx+1
+    DEC Cx          //Cx=Cx-1
+
+
+
+
+
+Interprete: Leera todo el comando por ejemplo "> ejecuta a.asm", "> salir"
+
+
+Comprobar que se escribe la cadena "ejecuta" y posterior a ello analizar la segunda cadena "a.asm" por ejemplo
+en caso de no existir se imprimira un mensaje de ERROR, pero en caso de si existir imprimir las operaciones que
+se van realizando 
+
+en terminar imprimir id, Ax, Bx, Cx, Dx, el valor de Pc y el valor de Ir.
+
+
+
+
+
+
+#include<stdio.h>
+#include<string.h>
+
+int main(){
+    char cadena[50]= "Esto es una prueba";
+    char copia[50];
+    char *delimitador=" ";
+    char *token;
+        strcpy(copia,cadena);
+        //printf("Cadena original:\n",cadena);
+        token = strtok(cadena,delimitador);
+        //printf("Mi token %s\n",token);
+        //printf("Cadena despues del strtok %s\n",cadena);
+
+        while (token !=NULL){
+            printf("Token: %s\n",token);
+            token=strtok(NULL,delimitador);
+        }
+        
+return 1;
+}
