@@ -2,10 +2,6 @@ funcion principal(){
     while(1){
         comando = entrada(entrada de consola);
         interprete(comando);
-    //////////FALTAAAAA//////////
-
-
-
     }
 }
 
@@ -14,11 +10,18 @@ funcion principal(){
 
 funcion interprete(comando){
     token = primerToken(?);
-    Si(token es "ejecutar"){Z
+    Si(token es "ejecutar"){
         token = segundoToken(?)     //a.asm
         leerArchivo(token)
     }
-    //////////FALTAAAAA//////////
+    si no(token es "salir"){
+        exit();
+    }
+    si no{
+        estructura.error = número de error tal; //Comando desconocido
+        return 0;
+    }
+
 
 }
 
@@ -33,44 +36,31 @@ funcion leerArchivo(archivo){
             Switch(token){
                 case MOV:
                     tokenPt2 = segundoToken(?);     //Ax,7
-                    numero = ANALizador(tokenPt2);
-                    alu(MOV, strtok(tokenPt2,","), numero);
+                    ANALizadorGpo1(MOV,tokenPt2);
                     break;
                 case ADD:
                     tokenPt2 = segundoToken(?);     //Ax,7
-                    numero = ANALizador(tokenPt2);
-                    alu(ADD, strtok(tokenPt2,","), numero);
+                    ANALizadorGpo1(ADD,tokenPt2);
                     break;
                 case SUB:
                     tokenPt2 = segundoToken(?);     //Ax,7
-                    numero = ANALizador(tokenPt2);
-                    alu(SUB, strtok(tokenPt2,","), numero);
+                    ANALizadorGpo1(SUB,tokenPt2);
                     break;
                 case DIV:
                     tokenPt2 = segundoToken(?);     //Ax,7
-                    numero = ANALizador(tokenPt2);
-                    si(numero != 0){
-                        alu(DIV, strtok(tokenPt2,","), numero);
-                    }si no{
-                        estructura.error = número de error tal; //ERROR division por cero
-                    }
+                    ANALizadorGpo1(DIV,tokenPt2);
                     break;
                 case MUL:
                     tokenPt2 = segundoToken(?);     //Ax,7
-                    numero = ANALizadorGpo2(tokenPt2);
-                    alu(MUL, strtok(tokenPt2,","), numero);
+                    ANALizadorGpo1(MUL,tokenPt2);
                     break;
                 case INC:
                     tokenPt2 = segundoToken(?);     //Ax,7
-                    si(ANALizadorGpo2(tokenPt2) == 1){
-                        aluGpo2(INC, tokenPt2);
-                    }
+                    ANALizadorGpo2(INC, tokenPt2);
                     break;
                 case DEC:
                     tokenPt2 = segundoToken(?);     //Ax,7
-                    si(ANALizadorGpo2(tokenPt2) == 1){
-                        aluGpo2(DEC, tokenPt2);
-                    }
+                    ANALizadorGpo2(DEC, tokenPt2);
                     break;
                 default:
                     estructura.error = número de error tal;     //ERROR operación inválida
@@ -81,31 +71,28 @@ funcion leerArchivo(archivo){
 }
 
 //MOV, ADD, SUB, DIV, MUL
-funcion ANALizadorGpo1(segundoToken){               //Ax,7
-    registro = strtok(segundoToken, ",");          //Ax
+funcion ANALizadorGpo1(operacion, segundoToken){               //Ax,7
+    registro = strtok(segundoToken, ",");          //Fx
     Switch(registro){
         case Ax;
-            num = strok(tercerToken)
-            numNum = atoi(num);
-            return numNum;
+            num = atoi(strok(tercerToken));
+            alu(operacion, registro, num);
             break;
         case Bx;
-            num = strok(tercerToken)
-            numNum = atoi(num);
-            return numNum;
+            num = atoi(strok(tercerToken));
+            alu(operacion, registro, num);
             break;
         case Cx;
-            num = strok(tercerToken)
-            numNum = atoi(num);
-            return numNum;
+            num = atoi(strok(tercerToken));
+            alu(operacion, registro, num);
             break;
         case Dx;
-            num = strok(tercerToken)
-            numNum = atoi(num);
-            return numNum;
+            num = atoi(strok(tercerToken));
+            alu(operacion, registro, num);
             break;
         default:
             estructura.error = número de error tal;     //ERROR registro Inválido o Delimitador erroneo
+            return 0;
             break;
     }
 }
@@ -138,16 +125,16 @@ funcion ANALizadorGpo2(segundoToken){               //Ax
     registro = segundoToken          //Ax
     Switch(registro){
         case Ax;
-            return 1;
+            aluGpo2(operacion, registro);
             break;
         case Bx;
-            return 1;
+            aluGpo2(operacion, registro)
             break;
         case Cx;
-            return 1;
+            aluGpo2(operacion, registro)
             break;
         case Dx;
-            return 1;
+            aluGpo2(operacion, registro)
             break;
         default:
             estructura.error = número de error tal;     //ERROR registro Inválido o Delimitador erroneo
