@@ -28,9 +28,17 @@ int interprete(char *comando){
             return 0;
         }
         
+        reg_id++;
+        
+        reg_ax = 0;
+        reg_bx = 0;
+        reg_cx = 0;
+        reg_dx = 0;
+        reg_pc = 0;
+        strcpy(reg_ir, "");
+        
         strcpy(reg_proceso, token);
         leerArchivo(token);
-        reg_id++;
         return 0;
     }
     else if(strcmp("salir", token) == 0){
@@ -80,27 +88,30 @@ int leerArchivo(char *nombre_archivo){
         if (tipo_op == 1) {
             char *operandos = strtok(NULL, "");
             if (operandos == NULL) {
-                imprimirError("Faltan operandos");
-                fclose(archivo);
-                return -1;
+                imprimirFilaConError("Faltan operandos");
+                continue;
             }
             if (analizadorGpo1(token, operandos) == 0) {
                 imprimirFila();
             }
         } else if (tipo_op == 2) {
-            char *registro = strtok(NULL, " ");
+            char *registro = strtok(NULL, " ,");
             if (registro == NULL) {
-                imprimirError("Falta registro");
-                fclose(archivo);
-                return -1;
+                imprimirFilaConError("Falta registro");
+                continue;
+            }
+            
+            char *extra = strtok(NULL, " ,");
+            if (extra != NULL) {
+                imprimirFilaConError("Sintaxis incorrecta");
+                continue;
             }
             if (analizadorGpo2(token, registro) == 0) {
                 imprimirFila();
             }
         } else {
-            imprimirError("Instrucción no reconocida");
-            fclose(archivo);
-            return -1;
+            imprimirFilaConError("Instrucción no reconocida");
+            continue;
         }
     }
 
@@ -113,7 +124,7 @@ int analizadorGpo1(char *tipo_operacion, char *operandos){
     char *valor_str = strtok(NULL, " ");
     
     if (registro == NULL || valor_str == NULL) {
-        imprimirError("Sintaxis incorrecta");
+        imprimirFilaConError("Sintaxis incorrecta");
         return -1;
     }
     
@@ -122,21 +133,21 @@ int analizadorGpo1(char *tipo_operacion, char *operandos){
     if (validarRegistro(registro) != -1) {
         return aluGpo1(tipo_operacion, registro, &numero);
     } else {
-        imprimirError("Registro inválido");
+        imprimirFilaConError("Registro inválido");
         return -1;
     }
 }
 
 int analizadorGpo2(char *tipo_operacion, char *registro){
     if (registro == NULL) {
-        imprimirError("Falta registro");
+        imprimirFilaConError("Falta registro");
         return -1;
     }
     
     if (validarRegistro(registro) != -1) {
         return aluGpo2(tipo_operacion, registro);
     } else {
-        imprimirError("Registro inválido");
+        imprimirFilaConError("Registro inválido");
         return -1;
     }
 }

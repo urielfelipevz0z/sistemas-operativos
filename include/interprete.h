@@ -15,10 +15,9 @@
 #define TAMANIO_COMANDO 256
 #define TAMANIO_LINEA 128
 
-// Arrays para validaciones simples
-static const char* const REGISTROS[] = {"Ax", "Bx", "Cx", "Dx"};
-static const char* const OPERACIONES_GPO1[] = {"MOV", "ADD", "SUB", "MUL", "DIV"};
-static const char* const OPERACIONES_GPO2[] = {"INC", "DEC"};
+static const char *const REGISTROS[] = {"Ax", "Bx", "Cx", "Dx"};
+static const char *const OPERACIONES_GPO1[] = {"MOV", "ADD", "SUB", "MUL", "DIV"};
+static const char *const OPERACIONES_GPO2[] = {"INC", "DEC"};
 
 #define NUM_REGISTROS 4
 #define NUM_OPS_GPO1 5
