@@ -5,9 +5,9 @@
  * @date 2025
  */
 
-#include "include/interprete.h"
-#include "include/alu.h"
-#include "include/imprimir.h"
+#include "interprete.h"
+#include "alu.h"
+#include "imprimir.h"
 
 
 
@@ -18,7 +18,16 @@ int main(){
     while (1) {
         printf(">> ");
         
-        fgets(comando, sizeof(comando), stdin);
+        if (fgets(comando, sizeof(comando), stdin) == NULL) {
+            printf("\nError leyendo entrada\n");
+            break;
+        }
+        
+        size_t len = strlen(comando);
+        if (len > 0 && comando[len-1] == '\n') {
+            comando[len-1] = '\0';
+        }
+        
         resultado = interprete(comando);
         
         if (resultado == 1) {
