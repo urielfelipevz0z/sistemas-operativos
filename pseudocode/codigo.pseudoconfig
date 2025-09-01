@@ -73,6 +73,7 @@ funcion leerArchivo(archivo){
 //MOV, ADD, SUB, DIV, MUL
 funcion ANALizadorGpo1(operacion, segundoToken){               //Ax,7
     registro = strtok(segundoToken, ",");          //Fx
+    
     Switch(registro){
         case Ax;
             num = atoi(strok(tercerToken));
