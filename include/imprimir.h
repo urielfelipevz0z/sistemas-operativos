@@ -12,4 +12,4 @@
 void imprimirEncabezado(void);
 void imprimirEstadoSistema(int mostrar_solo_encabezado);
 void imprimirEstadoCompleto(void);
-void imprimirError(char *mensaje);
+void imprimirError(int codigoError);

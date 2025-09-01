@@ -6,6 +6,8 @@
  */
 
 #include "include/imprimir.h"
+#include "include/globales.h"
+
 
 void imprimirEncabezado(void){
     printf("%-*s %-*s %-*s %-*s %-*s %-*s %-*s %-*s %s\n",
@@ -47,8 +49,8 @@ void imprimirEstadoCompleto(void){
     imprimirEstadoSistema(0);
 }
 
-void imprimirError(const char *mensaje){
-    printf("\n[ERROR] %s\n\n", mensaje);
+void imprimirError(int codigoError){
+    printf("\n[ERROR] %d\n\n", codigoError);
 }
 
 

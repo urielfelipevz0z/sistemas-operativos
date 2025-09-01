@@ -26,8 +26,9 @@ int main(){
         } else if (resultado == -1) {
             printf("Error procesando comando\n");
         }
+    printf("Ax = %d, Bx = %d, Cx = %d, Dx = %d\n", reg_ax, reg_bx, reg_cx, reg_dx);
     }
-    
+
     printf("Sistema terminado.\n");
     return 0;
 }

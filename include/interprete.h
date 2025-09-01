@@ -17,8 +17,8 @@
 #define TAMANIO_COMANDO 256
 #define TAMANIO_LINEA 128
 
-#define DELIMITADOR_ESPACIO ' '
-#define DELIMITADOR_COMA ','
+#define DELIMITADOR_ESPACIO " "
+#define DELIMITADOR_COMA ","
 
 #define ERROR_COMANDO_DESCONOCIDO -10
 #define ERROR_ARCHIVO_NO_ENCONTRADO -11
@@ -29,7 +29,6 @@
 #define ERROR_SEPARADOR_INCORRECTO -15
 #define ERROR_USO_INCORRECTO_DE_VALORES -16
 #define ERROR_DIVISION_POR_CERO -17
-
 
 static const char REG_AX[] = "Ax";
 static const char REG_BX[] = "Bx";
