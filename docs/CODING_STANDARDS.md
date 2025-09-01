@@ -2,11 +2,6 @@
 
 ## 1. Estándares Generales de C
 
-### Estilo de Código
-- **Estándar**: C99 (ISO/IEC 9899:1999) como mínimo
-- **Indentación**: Tabuladores
-- **Codificación**: UTF-8
-
 ### Nomenclatura
 
 #### Variables y Funciones
@@ -89,10 +84,6 @@ typedef struct {
     char campo2[50];
 } estructura_t;
 
-/* Declaraciones de funciones */
-int funcion_publica(int parametro);
-void otra_funcion(estructura_t *datos);
-
 #endif /* MODULO_H */
 ```
 
@@ -148,27 +139,6 @@ token = strtok(linea, " ");
 ```
 
 ## 5. Manejo de Errores
-
-### Códigos de Error Estándar
-```c
-#define SUCCESS 0
-#define ERROR_ARCHIVO_NO_ENCONTRADO -1
-#define ERROR_COMANDO_INVALIDO -2
-#define ERROR_REGISTRO_INVALIDO -3
-#define ERROR_DIVISION_POR_CERO -4
-#define ERROR_OPERACION_INVALIDA -5
-#define ERROR_MEMORIA_INSUFICIENTE -6
-```
-
-### Estructura de Error
-```c
-typedef struct {
-    int codigo;
-    char mensaje[256];
-    char archivo[100];
-    int linea;
-} error_info_t;
-```
 
 ### Espacios en Operadores
 ```c

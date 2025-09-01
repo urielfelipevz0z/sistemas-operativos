@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -std=c99 -Wall -Wextra -Werror -g -O0 -Iinclude
-TARGET = bin/sistemas_operativos
+TARGET = bin/sistema_operativo
 
 SOURCES = principal.c src/alu.c src/interprete.c src/imprimir.c
 OBJECTS = $(SOURCES:.c=.o)
