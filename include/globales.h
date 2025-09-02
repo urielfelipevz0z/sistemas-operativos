@@ -1,10 +1,3 @@
-/**
- * @file globales.h
- * @brief Header para el módulo ALU
- * @author Equipo: Los sistématicos
- * @date 2025
- */
-
 #ifndef GLOBALES_H
 #define GLOBALES_H
 

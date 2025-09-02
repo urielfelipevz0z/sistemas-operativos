@@ -6,7 +6,7 @@ int reg_bx = 0;
 int reg_cx = 0;
 int reg_dx = 0;
 
-int *obtenerRegistro(const char *nombre) {
+int *obtenerRegistro(const char *nombre){
     if (strcmp("Ax", nombre) == 0) return &reg_ax;
     if (strcmp("Bx", nombre) == 0) return &reg_bx;
     if (strcmp("Cx", nombre) == 0) return &reg_cx;
@@ -16,46 +16,52 @@ int *obtenerRegistro(const char *nombre) {
 
 int aluGpo1(char *operacion, char *registro, int *valor){
     int *reg = obtenerRegistro(registro);
-    if (reg == NULL) {
+    if (reg == NULL){
         imprimirFilaConError("Registro inválido");
         return -1;
     }
     
-    if (strcmp("MOV", operacion) == 0) {
+    if (strcmp("MOV", operacion) == 0){
         *reg = *valor;
-    } else if (strcmp("ADD", operacion) == 0) {
+    }else if (strcmp("ADD", operacion) == 0){
         *reg += *valor;
-    } else if (strcmp("SUB", operacion) == 0) {
+    }else if (strcmp("SUB", operacion) == 0){
         *reg -= *valor;
-    } else if (strcmp("MUL", operacion) == 0) {
+    }else if (strcmp("MUL", operacion) == 0){
         *reg *= *valor;
-    } else if (strcmp("DIV", operacion) == 0) {
-        if (*valor == 0) {
+    }else if (strcmp("DIV", operacion) == 0){
+        if (*valor == 0){
             imprimirFilaConError("División por cero");
             return -1;
         }
         *reg /= *valor;
-    } else {
+    } else{
         imprimirFilaConError("Operación no reconocida");
         return -1;
     }
+
+    reg_pc++;
+
     return 0;
 }
 
 int aluGpo2(char *operacion, char *registro){
     int *reg = obtenerRegistro(registro);
-    if (reg == NULL) {
+    if (reg == NULL){
         imprimirFilaConError("Registro inválido");
         return -1;
     }
     
-    if (strcmp("INC", operacion) == 0) {
+    if (strcmp("INC", operacion) == 0){
         (*reg)++;
-    } else if (strcmp("DEC", operacion) == 0) {
+    } else if (strcmp("DEC", operacion) == 0){
         (*reg)--;
-    } else {
+    } else{
         imprimirFilaConError("Operación no reconocida");
         return -1;
     }
+
+    reg_pc++;
+        
     return 0;
 }
