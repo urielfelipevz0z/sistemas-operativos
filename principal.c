@@ -5,6 +5,21 @@
  * @date 2025
  */
 
+/**
+ * Compilación del proyecto versión detallada que hace make:
+
+gcc -Iinclude -c principal.c -o build/principal.o
+gcc -Iinclude -c src/alu.c -o build/alu.o
+gcc -Iinclude -c src/interprete.c -o build/interprete.o
+gcc -Iinclude -c src/imprimir.c -o build/imprimir.o
+gcc build/principal.o build/alu.o build/interprete.o build/imprimir.o -o bin/sistema_operativo
+
+* Compilación del proyecto versión simplificada:
+
+gcc principal.c src/alu.c src/interprete.c src/imprimir.c -o bin/sistema_operativo -Iinclude
+
+ */
+
 #include "interprete.h"
 #include "alu.h"
 #include "imprimir.h"
