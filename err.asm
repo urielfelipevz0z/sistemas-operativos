@@ -5,3 +5,5 @@ INC Ax,Bx
 MUL Ax.Bx
 MOV Ax,Z
 DIV Ax,0
+DEC
+ADD

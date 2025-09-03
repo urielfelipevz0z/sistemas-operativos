@@ -19,7 +19,7 @@ int interprete(char *comando){
     }
     
     if(strcmp("ejecuta", token) == 0){
-        token = strtok(NULL, " ");
+        token = strtok(NULL, "\0");
         if (token == NULL){
             imprimirError("Falta especificar archivo");
             return 0;
@@ -29,17 +29,16 @@ int interprete(char *comando){
         reg_bx = 0;
         reg_cx = 0;
         reg_dx = 0;
-        reg_pc = 0;
+        reg_pc = 1;
         strcpy(reg_ir, "");
-        
         strcpy(reg_proceso, token);
+        
         if (leerArchivo(token) == -1){
             reg_id--;
             strcpy(reg_proceso, "");
         }
 
         reg_id++;
-
         return 0;
     } else if(strcmp("salir", token) == 0){
         return 1;
@@ -57,7 +56,7 @@ int leerArchivo(char *nombre_archivo){
     }
 
     char linea[TAMANIO_LINEA];
-    reg_pc = 0;
+    reg_pc = 1;
     
     imprimirEncabezado();
     
@@ -78,20 +77,17 @@ int leerArchivo(char *nombre_archivo){
         
         int tipo_op = tipoOperacion(token);
         
+        
+        char *operandos = strtok(NULL, "");
+        if (operandos == NULL){
+            imprimirFilaConError("Cantidad incorrecta de operandos");
+            continue;
+        }
+
         if (tipo_op == 1){
-            char *operandos = strtok(NULL, "");
-            if (operandos == NULL){
-                imprimirFilaConError("Cantidad incorrecta de operandos");
-                continue;
-            }
             analizadorGpo1(token, operandos);
         } else if (tipo_op == 2){
-            char *operandos_restantes = strtok(NULL, "");
-            if (operandos_restantes == NULL){
-                imprimirFilaConError("Cantidad incorrecta de operandos");
-                continue;
-            }
-            analizadorGpo2(token, operandos_restantes);
+            analizadorGpo2(token, operandos);
         } else{
             imprimirFilaConError("Instrucción no reconocida");
             continue;
@@ -127,9 +123,11 @@ void analizadorGpo1(char *tipo_operacion, char *operandos){
     }
 
     int numero = atoi(valor);
-    if (aluGpo1(tipo_operacion, registro, &numero) == 0){
+    int resultado = aluGpo1(tipo_operacion, registro, &numero);
+    if (resultado == 0){
         imprimirFila();
     }
+    // No imprimir nada si hubo error, ya se manejó en aluGpo1
 }
 
 void analizadorGpo2(char *tipo_operacion, char *registro){
@@ -148,7 +146,8 @@ void analizadorGpo2(char *tipo_operacion, char *registro){
         return;
     }
     
-    if (aluGpo2(tipo_operacion, registro) == 0){
+    int resultado = aluGpo2(tipo_operacion, registro);
+    if (resultado == 0){
         imprimirFila();
     }
 }
@@ -178,7 +177,7 @@ int tipoOperacion(const char *operacion){
     return -1;
 }
 
-int esNumeroValido(const char *str){    
+int esNumeroValido(const char *str){
     int len = strlen(str);
     int i = 0;
     

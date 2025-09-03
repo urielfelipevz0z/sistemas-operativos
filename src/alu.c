@@ -21,6 +21,8 @@ int aluGpo1(char *operacion, char *registro, int *valor){
         return -1;
     }
     
+    reg_pc++;
+    
     if (strcmp("MOV", operacion) == 0){
         *reg = *valor;
     }else if (strcmp("ADD", operacion) == 0){
@@ -31,16 +33,16 @@ int aluGpo1(char *operacion, char *registro, int *valor){
         *reg *= *valor;
     }else if (strcmp("DIV", operacion) == 0){
         if (*valor == 0){
+            reg_pc--;
             imprimirFilaConError("División por cero");
             return -1;
         }
         *reg /= *valor;
     } else{
+        reg_pc--;
         imprimirFilaConError("Operación no reconocida");
         return -1;
     }
-
-    reg_pc++;
 
     return 0;
 }
@@ -52,16 +54,17 @@ int aluGpo2(char *operacion, char *registro){
         return -1;
     }
     
+    reg_pc++;
+    
     if (strcmp("INC", operacion) == 0){
         (*reg)++;
     } else if (strcmp("DEC", operacion) == 0){
         (*reg)--;
     } else{
+        reg_pc--;
         imprimirFilaConError("Operación no reconocida");
         return -1;
     }
-
-    reg_pc++;
         
     return 0;
 }
