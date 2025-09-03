@@ -1,47 +1,31 @@
 CC = gcc
-CFLAGS = -std=c99 -Wall -Wextra -Werror -g -O0
-INCLUDES = -Iinclude
-SRC_DIR = src
-INCLUDE_DIR = include
-BUILD_DIR = build
-BIN_DIR = bin
-TARGET = $(BIN_DIR)/sistemas_operativos
+CFLAGS = -std=c99 -Wall -Wextra -Werror -g -O0 -Iinclude
+TARGET = bin/sistema_operativo
 
-SOURCES = principal.c $(SRC_DIR)/alu.c $(SRC_DIR)/interprete.c $(SRC_DIR)/imprimir.c
-OBJECTS = $(BUILD_DIR)/principal.o $(BUILD_DIR)/alu.o $(BUILD_DIR)/interprete.o $(BUILD_DIR)/imprimir.o
+SOURCES = principal.c src/alu.c src/interprete.c src/imprimir.c
+OBJECTS = $(SOURCES:.c=.o)
+OBJECTS := $(addprefix build/, $(notdir $(OBJECTS)))
 
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	@mkdir -p $(BIN_DIR)
-	$(CC) $(OBJECTS) -o $@
-	@echo "Build complete: $(TARGET)"
+	@mkdir -p bin
+	$(CC) $^ -o $@
+	@echo "Build complete: $@"
 
-$(BUILD_DIR)/principal.o: principal.c
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+build/%.o: %.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/alu.o: $(SRC_DIR)/alu.c
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-$(BUILD_DIR)/interprete.o: $(SRC_DIR)/interprete.c
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
-$(BUILD_DIR)/imprimir.o: $(SRC_DIR)/imprimir.c
-	@mkdir -p $(BUILD_DIR)
-	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
-
+build/%.o: src/%.c
+	@mkdir -p build
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(BUILD_DIR) $(BIN_DIR)
+	rm -rf build bin
 	@echo "Clean complete"
 
 run: $(TARGET)
-	$(TARGET)
+	./$(TARGET)
 
-$(BUILD_DIR)/principal.o: $(INCLUDE_DIR)/alu.h $(INCLUDE_DIR)/interprete.h $(INCLUDE_DIR)/imprimir.h
-$(BUILD_DIR)/alu.o: $(INCLUDE_DIR)/alu.h
-$(BUILD_DIR)/interprete.o: $(INCLUDE_DIR)/interprete.h $(INCLUDE_DIR)/alu.h $(INCLUDE_DIR)/imprimir.h
-$(BUILD_DIR)/imprimir.o: $(INCLUDE_DIR)/imprimir.h $(INCLUDE_DIR)/alu.h
+.PHONY: all clean run

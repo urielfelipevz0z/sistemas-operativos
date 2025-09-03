@@ -1,134 +1,193 @@
-/**
- * @file interprete.c
- * @brief 
- * @author Equipo: Los sistématicos
- * @date 2025
- */
+#include "interprete.h"
+#include "alu.h"
+#include "imprimir.h"
+#include "globales.h"
+#include <stdlib.h>
 
-#include "include/interprete.h"
-#include "include/alu.h"
-#include "include/imprimir.h"
-#include "include/globales.h"
+int reg_id = 0;
+char reg_proceso[16] = "";
+int reg_pc = 0;
+char reg_ir[16] = "";
 
-static const char CMD_EJECUTA[] = "ejecuta";
-static const char CMD_SALIR[] = "salir";
-
-int reg_id;
-char reg_proceso[16];
-
-
-int interprete(char *comando){  //ejecutar a.asm
+int interprete(char *comando){    
     char copia[TAMANIO_COMANDO];
-    char *token;
     strcpy(copia, comando);
-    token = strtok(copia, DELIMITADOR_ESPACIO); //ejecutar
-    if(strcmp(CMD_EJECUTA, token) == 0){
-        token = strtok(NULL, DELIMITADOR_ESPACIO); //a.asm
-        strcpy(reg_proceso, token);
-        leerArchivo(token); //a.asm
-        reg_id++;
+    char *token = strtok(copia, " ");
+    
+    if (token == NULL){
         return 0;
     }
-    else if(strcmp(CMD_SALIR, token) == 0){
-        exit(0);
+    
+    if(strcmp("ejecuta", token) == 0){
+        token = strtok(NULL, "\0");
+        if (token == NULL){
+            imprimirError("Falta especificar archivo");
+            return 0;
+        }
+        
+        reg_ax = 0;
+        reg_bx = 0;
+        reg_cx = 0;
+        reg_dx = 0;
+        reg_pc = 1;
+        strcpy(reg_ir, "");
+        strcpy(reg_proceso, token);
+        
+        if (leerArchivo(token) == -1){
+            reg_id--;
+            strcpy(reg_proceso, "");
+        }
+
+        reg_id++;
+        return 0;
+    } else if(strcmp("salir", token) == 0){
         return 1;
-    }
-    else{
-        imprimirError(ERROR_INSTRUCCION_NO_RECONOCIDA);
-        return -1;
+    } else{
+        imprimirError("Comando no reconocido");
+        return 0;
     }
 }
-
 
 int leerArchivo(char *nombre_archivo){
     FILE *archivo = fopen(nombre_archivo, "r");
     if (archivo == NULL){
-        imprimirError(ERROR_ARCHIVO_NO_ENCONTRADO);
+        imprimirError("Archivo no encontrado");
+        return -1;
     }
 
     char linea[TAMANIO_LINEA];
-    char copia[TAMANIO_LINEA];
-    char *token;
-    char reg_ir[16];
-    int reg_pc = 0;   
-    while (fgets(linea, sizeof(linea), archivo) != NULL){   //MOV Ax,7
-        reg_pc++;
-        strcpy(copia, linea);   //MOV Ax,7
+    reg_pc = 1;
+    
+    imprimirEncabezado();
+    
+    while (fgets(linea, sizeof(linea), archivo) != NULL){
+        if (linea[strlen(linea)-1] == '\n'){
+            linea[strlen(linea)-1] = '\0';
+        }
+        
         strcpy(reg_ir, linea);
-        token = strtok(copia, DELIMITADOR_ESPACIO); //MOV
+        
+        char copia[TAMANIO_LINEA];
+        strcpy(copia, linea);
+        char *token = strtok(copia, " ");
+        
+        if (token == NULL){
+            continue;
+        }
+        
+        int tipo_op = tipoOperacion(token);
+        
+        
+        char *operandos = strtok(NULL, "");
+        if (operandos == NULL){
+            imprimirFilaConError("Cantidad incorrecta de operandos");
+            continue;
+        }
 
-        if (strcmp(OP_MOV, token) == 0){ //MOV = MOV
-            return analizadorGpo1(token, strok(NULL, DELIMITADOR_ESPACIO)); //Ax,7
-        }
-        else if (strcmp(OP_ADD, token) == 0){
-            return analizadorGpo1(token, strok(NULL, DELIMITADOR_ESPACIO));
-        }
-        else if (strcmp(OP_SUB, token) == 0){
-            return analizadorGpo1(token, strok(NULL, DELIMITADOR_ESPACIO));
-        }
-        else if (strcmp(OP_MUL, token) == 0){
-            return analizadorGpo1(token, strok(NULL, DELIMITADOR_ESPACIO));
-        }
-        else if (strcmp(OP_DIV, token) == 0){
-            return analizadorGpo1(token, strok(NULL, DELIMITADOR_ESPACIO));
-        }
-        else if (strcmp(OP_INC, token) == 0){
-            return analizadorGpo2(token, strtok(NULL, DELIMITADOR_ESPACIO));
-        }
-        else if (strcmp(OP_DEC, token) == 0){
-            return analizadorGpo2(token, strtok(NULL, DELIMITADOR_ESPACIO));
-        }
-        else{
-            imprimirError(ERROR_INSTRUCCION_NO_RECONOCIDA);
-            return -1;
+        if (tipo_op == 1){
+            analizadorGpo1(token, operandos);
+        } else if (tipo_op == 2){
+            analizadorGpo2(token, operandos);
+        } else{
+            imprimirFilaConError("Instrucción no reconocida");
+            continue;
         }
     }
 
     fclose(archivo);
+    return 0;
 }
 
-
-int analizadorGpo1(char *tipo_operacion, char *operandos){  //Ax,7
-    char *registro = strtok(operandos, DELIMITADOR_COMA);   //Ax
-    int numero_entero = atoi(strtok(NULL, DELIMITADOR_ESPACIO)); //7
+void analizadorGpo1(char *tipo_operacion, char *operandos){
+    if (strchr(operandos, '.') != NULL){
+        imprimirFilaConError("Separador incorrecto");
+        return;
+    }
     
-    if(strcmp(REG_AX, registro) == 0){
-        return aluGpo1(tipo_operacion,registro, numero_entero);
+    char *registro = strtok(operandos, ",");
+    char *valor = strtok(NULL, "");
+    
+    if (valor == NULL){
+        imprimirFilaConError("Cantidad incorrecta de operandos");
+        return;
     }
-    else if(strcmp(REG_BX, registro) == 0){
-        return aluGpo1(tipo_operacion,registro, numero_entero);
+    
+    if (validarRegistro(registro) == -1){
+        imprimirFilaConError("Registro inválido");
+        return;
     }
-    else if(strcmp(REG_CX, registro) == 0){
-        return aluGpo1(tipo_operacion,registro, numero_entero);
+    
+    if (!esNumeroValido(valor)){
+        imprimirFilaConError("Uso incorrecto de valores");
+        return;
     }
-    else if(strcmp(REG_DX, registro) == 0){
-        return aluGpo1(tipo_operacion,registro, numero_entero);
+
+    int numero = atoi(valor);
+    int resultado = aluGpo1(tipo_operacion, registro, &numero);
+    if (resultado == 0){
+        imprimirFila();
     }
-    else{
-        imprimirError(ERROR_REGISTRO_INVALIDO);
-        return -1;
+    // No imprimir nada si hubo error, ya se manejó en aluGpo1
+}
+
+void analizadorGpo2(char *tipo_operacion, char *registro){
+    if (registro == NULL){
+        imprimirFilaConError("Cantidad incorrecta de operandos");
+        return;
+    }
+    
+    if (strchr(registro, ',') != NULL){
+        imprimirFilaConError("Cantidad incorrecta de operandos");
+        return;
+    }
+    
+    if (validarRegistro(registro) == -1){
+        imprimirFilaConError("Registro inválido");
+        return;
+    }
+    
+    int resultado = aluGpo2(tipo_operacion, registro);
+    if (resultado == 0){
+        imprimirFila();
     }
 }
 
-
-int analizadorGpo2(char *tipo_operacion, char *registro){   //Ax
-    if (strcmp(REG_AX, registro) == 0){
-        return aluGpo2(tipo_operacion, registro);
+int validarRegistro(const char *registro){
+    for (int i = 0; i < NUM_REGISTROS; i++) {
+        if (strcmp(REGISTROS[i], registro) == 0){
+            return i;
+        }
     }
-    else if (strcmp(REG_BX, registro) == 0){
-        return aluGpo2(tipo_operacion, registro);
-    }
-    else if (strcmp(REG_CX, registro) == 0){
-        return aluGpo2(tipo_operacion, registro);
-    }
-    else if (strcmp(REG_DX, registro) == 0){
-        return aluGpo2(tipo_operacion, registro);
-    }
-    else{
-        imprimirError(ERROR_REGISTRO_INVALIDO);
-        return -1;
-    }
+    return -1;
 }
 
+int tipoOperacion(const char *operacion){
+    for (int i = 0; i < NUM_OPS_GPO1; i++){
+        if (strcmp(OPERACIONES_GPO1[i], operacion) == 0){
+            return 1;
+        }
+    }
+    
+    for (int i = 0; i < NUM_OPS_GPO2; i++){
+        if (strcmp(OPERACIONES_GPO2[i], operacion) == 0){
+            return 2;
+        }
+    }
+    
+    return -1;
+}
 
-
+int esNumeroValido(const char *str){
+    int len = strlen(str);
+    int i = 0;
+    
+    if (str[0] == '-') i = 1;
+    
+    for (; i < len; i++){
+        if (str[i] < '0' || str[i] > '9'){
+            return 0;
+        }
+    }
+    
+    return 1;
+}

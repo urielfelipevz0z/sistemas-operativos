@@ -1,6 +1,20 @@
-# .gitignore
-
-# Compiled source files
+# Archivos compilados
 *.o
 *.out
 *.exe
+build/
+test/*.exe
+test/*.out
+bin/
+
+# Archivos del editor
+*.swp
+*.swo
+
+# Archivos de depuración
+*.gdb
+core
+
+# Archivos temporales
+*.tmp
+*.bak

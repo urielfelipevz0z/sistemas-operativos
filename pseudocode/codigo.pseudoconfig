@@ -1,156 +1,335 @@
+globales{
+    entero reg_ax = 0, reg_bx = 0, reg_cx = 0, reg_dx = 0;
+    entero reg_pc = 1;         // Program Counter (apunta a la siguiente instrucción)
+    cadena reg_ir[16] = "";    // Instruction Register
+    entero reg_id = 0;         // Process ID
+    cadena reg_proceso[16] = ""; // Nombre del proceso actual
+}
+
 funcion principal(){
-    while(1){
-        comando = entrada(entrada de consola);
-        interprete(comando);
-    }
-}
-
-
-
-
-funcion interprete(comando){
-    token = primerToken(?);
-    Si(token es "ejecutar"){
-        token = segundoToken(?)     //a.asm
-        leerArchivo(token)
-    }
-    si no(token es "salir"){
-        exit();
-    }
-    si no{
-        estructura.error = número de error tal; //Comando desconocido
-        return 0;
-    }
-
-
-}
-
-funcion leerArchivo(archivo){
-    si(fopen(archivo) == NULL){
-        estructura.error = número de error tal; //No existe el archivo
-        return;
-    }
-    si no{ 
-        mientras(fgets(linea,sizeof(linea),FILE archivo) != NULL){      //MOV Ax,7
-            token = primerToken(?);
-            Switch(token){
-                case MOV:
-                    tokenPt2 = segundoToken(?);     //Ax,7
-                    ANALizadorGpo1(MOV,tokenPt2);
-                    break;
-                case ADD:
-                    tokenPt2 = segundoToken(?);     //Ax,7
-                    ANALizadorGpo1(ADD,tokenPt2);
-                    break;
-                case SUB:
-                    tokenPt2 = segundoToken(?);     //Ax,7
-                    ANALizadorGpo1(SUB,tokenPt2);
-                    break;
-                case DIV:
-                    tokenPt2 = segundoToken(?);     //Ax,7
-                    ANALizadorGpo1(DIV,tokenPt2);
-                    break;
-                case MUL:
-                    tokenPt2 = segundoToken(?);     //Ax,7
-                    ANALizadorGpo1(MUL,tokenPt2);
-                    break;
-                case INC:
-                    tokenPt2 = segundoToken(?);     //Ax,7
-                    ANALizadorGpo2(INC, tokenPt2);
-                    break;
-                case DEC:
-                    tokenPt2 = segundoToken(?);     //Ax,7
-                    ANALizadorGpo2(DEC, tokenPt2);
-                    break;
-                default:
-                    estructura.error = número de error tal;     //ERROR operación inválida
-                    break;
-            }
+    cadena comando[256];
+    entero resultado;
+    
+    mientras(verdadero){
+        imprimir(">> ");
+        
+        si(leer_linea(comando) == NULL){
+            imprimir("Error leyendo entrada");
+            salir;
+        }
+        
+        // Remover salto de línea
+        si(comando[longitud(comando)-1] == '\n'){
+            comando[longitud(comando)-1] = '\0';
+        }
+        
+        resultado = interprete(comando);
+        
+        si(resultado == 1){
+            salir; // Comando "salir"
+        } sino si(resultado == -1){
+            imprimir("Error procesando comando");
         }
     }
-}
-
-//MOV, ADD, SUB, DIV, MUL
-funcion ANALizadorGpo1(operacion, segundoToken){               //Ax,7
-    registro = strtok(segundoToken, ",");          //Fx
     
-    Switch(registro){
-        case Ax;
-            num = atoi(strok(tercerToken));
-            alu(operacion, registro, num);
-            break;
-        case Bx;
-            num = atoi(strok(tercerToken));
-            alu(operacion, registro, num);
-            break;
-        case Cx;
-            num = atoi(strok(tercerToken));
-            alu(operacion, registro, num);
-            break;
-        case Dx;
-            num = atoi(strok(tercerToken));
-            alu(operacion, registro, num);
-            break;
-        default:
-            estructura.error = número de error tal;     //ERROR registro Inválido o Delimitador erroneo
-            return 0;
-            break;
+    imprimir("Sistema terminado.");
+    retornar 0;
+}
+
+funcion interprete(comando){
+    cadena copia[256];
+    copiar(copia, comando);
+    cadena token = obtener_primer_token(copia, " ");
+    
+    si(token == NULL){ // Esto es para por si el usuario presiona "Enter" y no ocurran errores
+        retornar 0;
+    }
+    
+    si(token es "ejecuta"){
+        token = obtener_siguiente_token(NULL, "\0"); // En este punto estamos leyendo el nombre del archivo
+        si(token == NULL){
+            imprimir_error("Falta especificar archivo");
+            retornar 0;
+        }
+        
+        // Inicializar estado del sistema
+        reg_ax = 0; reg_bx = 0; reg_cx = 0; reg_dx = 0;
+        reg_pc = 1;            // PC inicia en 1
+        reg_ir = "";
+        reg_proceso = token;
+        
+        si(leer_archivo(token) == -1){
+            // Revertir en caso de error
+            reg_id--;
+            reg_proceso = "";
+        }
+
+        reg_id++; // Incrementar ID del proceso después de ejecutar el proceso
+
+        retornar 0;
+    } sino si(token es "salir"){
+        retornar 1;
+    } sino{
+        imprimir_error("Comando no reconocido");
+        retornar 0;
     }
 }
 
-//MOV, ADD, SUB, DIV, MUL
-aluGpo1(operacion, registro, dato){
-    Switch(operacion){
-        case MOV:
-            registro = dato;
-            break;
-        case ADD:
-            registro = registro + dato;
-            break;
-        case SUB:
-            registro = registro - dato;
-            break;
-        case DIV:
-            registro = registro / dato;
-            break;
-        case MUL:
-            registro = registro * dato;
-            break;
+funcion leer_archivo(nombre_archivo){
+    archivo = abrir_archivo(nombre_archivo, "lectura");
+    si(archivo == NULL){
+        imprimir_error("Archivo no encontrado");
+        retornar -1;
+    }
+    
+    cadena linea[128];
+    reg_pc = 1;  // Inicializar PC en 1 para que cada que se lea un nuevo archivo apunte a una primera instrucción
+
+    imprimir_encabezado_tabla();
+
+    mientras(leer_linea_archivo(linea, archivo) != NULL){ // Leer cada línea del archivo
+        // Remover salto de línea
+        si(linea[longitud(linea)-1] == '\n'){
+            linea[longitud(linea)-1] = '\0';
+        }
+        
+        // Guardar instrucción actual en IR
+        reg_ir = linea;
+        
+        // Analizar instrucción
+        cadena copia[128];
+        copiar(copia, linea);
+        cadena token = obtener_primer_token(copia, " "); // En este punto estamos leyendo la operación
+
+        si(token == NULL){
+            continuar; // Esto es para el caso de que en nuestro archivo .asm se tenga una línea vacía siga sin errores
+        }
+        
+        entero tipo_operacion = determinar_tipo_operacion(token); // Función auxiliar para ayudarnos a encontrar el tipo de operación (si recibe dos operandos(registro/valor) o si solo recibe un valor)
+        
+        cadena operandos = obtener_resto_linea();
+        si(operandos == NULL){
+            imprimir_fila_con_error("Cantidad incorrecta de operandos");
+            continuar;
+        }
+
+        si(tipo_operacion == 1){  // Operaciones grupo 1: MOV, ADD, SUB, MUL, DIV
+            analizador_grupo1(token, operandos);
+        } sino si(tipo_operacion == 2){  // Operaciones grupo 2: INC, DEC
+            analizador_grupo2(token, operandos);
+        } sino{
+            imprimir_fila_con_error("Instrucción no reconocida");
+            continuar;
+        }
+    }
+    
+    cerrar_archivo(archivo);
+    retornar 0;
+}
+
+// Analiza operaciones de dos operandos: MOV, ADD, SUB, MUL, DIV
+funcion analizador_grupo1(tipo_operacion, operandos){
+    // Validar separador
+    si(contiene(operandos, '.') != NULL){
+        imprimir_fila_con_error("Separador incorrecto");
+        retornar;
+    }
+    
+    cadena registro = obtener_token(operandos, ",");
+    cadena valor_str = obtener_siguiente_token(NULL, "");
+    
+    si(valor_str == NULL){
+        imprimir_fila_con_error("Cantidad incorrecta de operandos");
+        retornar;
+    }
+    
+    si(validar_registro(registro) == -1){
+        imprimir_fila_con_error("Registro inválido");
+        retornar;
+    }
+    
+    si(no es_numero_valido(valor_str)){
+        imprimir_fila_con_error("Uso incorrecto de valores");
+        retornar;
+    }
+    
+    entero valor = convertir_a_entero(valor_str);
+    si(alu_grupo1(tipo_operacion, registro, valor) == 0){
+        imprimir_fila_correcta();
+    } sino{
+        imprimir_fila_correcta(); // El PC ya fue manejado en ALU
     }
 }
 
-
-
-//INC, DEC
-funcion ANALizadorGpo2(segundoToken){               //Ax
-    registro = segundoToken          //Ax
-    Switch(registro){
-        case Ax;
-            aluGpo2(operacion, registro);
-            break;
-        case Bx;
-            aluGpo2(operacion, registro)
-            break;
-        case Cx;
-            aluGpo2(operacion, registro)
-            break;
-        case Dx;
-            aluGpo2(operacion, registro)
-            break;
-        default:
-            estructura.error = número de error tal;     //ERROR registro Inválido o Delimitador erroneo
-            break;
+// Analiza operaciones de un operando: INC, DEC
+funcion analizador_grupo2(tipo_operacion, registro){
+    si(registro == NULL){
+        imprimir_fila_con_error("Cantidad incorrecta de operandos");
+        retornar;
+    }
+    
+    si(contiene(registro, ',') != NULL){
+        imprimir_fila_con_error("Cantidad incorrecta de operandos");
+        retornar;
+    }
+    
+    si(validar_registro(registro) == -1){
+        imprimir_fila_con_error("Registro inválido");
+        retornar;
+    }
+    
+    si(alu_grupo2(tipo_operacion, registro) == 0){
+        imprimir_fila_correcta();
+    } sino{
+        imprimir_fila_correcta(); // El PC ya fue manejado en ALU
     }
 }
 
-//INC, DEC
-aluGpo2(operacion, registro){
-    Switch(operacion){
-        case INC:
-            registro = registro + 1;
-            break;
-        case DEC:
-            registro = registro - 1;
-            break;
+// Unidad Aritmético-Lógica para operaciones grupo 1
+funcion alu_grupo1(operacion, nombre_registro, valor){
+    puntero_registro = obtener_puntero_registro(nombre_registro);
+    si(puntero_registro == NULL){
+        imprimir_fila_con_error("Registro inválido");
+        retornar -1;
     }
+    
+    // Incrementar PC ANTES de ejecutar para apuntar a siguiente instrucción
+    reg_pc++;
+    
+    segun(operacion){
+        caso "MOV":
+            *puntero_registro = valor;
+            romper;
+        caso "ADD":
+            *puntero_registro += valor;
+            romper;
+        caso "SUB":
+            *puntero_registro -= valor;
+            romper;
+        caso "MUL":
+            *puntero_registro *= valor;
+            romper;
+        caso "DIV":
+            si(valor == 0){
+                reg_pc--; // Retroceder PC en caso de error
+                imprimir_fila_con_error("División por cero");
+                retornar -1;
+            }
+            *puntero_registro /= valor;
+            romper;
+        por_defecto:
+            reg_pc--; // Retroceder PC en caso de error
+            imprimir_fila_con_error("Operación no reconocida");
+            retornar -1;
+    }
+    
+    retornar 0;
+}
+
+// Unidad Aritmético-Lógica para operaciones grupo 2
+funcion alu_grupo2(operacion, nombre_registro){
+    puntero_registro = obtener_puntero_registro(nombre_registro);
+    si(puntero_registro == NULL){
+        imprimir_fila_con_error("Registro inválido");
+        retornar -1;
+    }
+    
+    // Incrementar PC ANTES de ejecutar para apuntar a siguiente instrucción
+    reg_pc++;
+    
+    segun(operacion){
+        caso "INC":
+            (*puntero_registro)++;
+            romper;
+        caso "DEC":
+            (*puntero_registro)--;
+            romper;
+        por_defecto:
+            reg_pc--; // Retroceder PC en caso de error
+            imprimir_fila_con_error("Operación no reconocida");
+            retornar -1;
+    }
+    
+    retornar 0;
+}
+
+// Funciones auxiliares
+funcion obtener_puntero_registro(nombre){
+    segun(nombre){
+        caso "Ax": retornar &reg_ax;
+        caso "Bx": retornar &reg_bx;
+        caso "Cx": retornar &reg_cx;
+        caso "Dx": retornar &reg_dx;
+        por_defecto: retornar NULL;
+    }
+}
+
+funcion validar_registro(registro){
+    registros_validos[] = {"Ax", "Bx", "Cx", "Dx"};
+    para(i = 0; i < 4; i++){
+        si(registro == registros_validos[i]){
+            retornar i;
+        }
+    }
+    retornar -1;
+}
+
+funcion determinar_tipo_operacion(operacion){
+    operaciones_grupo1[] = {"MOV", "ADD", "SUB", "MUL", "DIV"};
+    operaciones_grupo2[] = {"INC", "DEC"};
+    
+    // Verificar grupo 1
+    para(i = 0; i < 5; i++){
+        si(operacion == operaciones_grupo1[i]){
+            retornar 1;
+        }
+    }
+    
+    // Verificar grupo 2
+    para(i = 0; i < 2; i++){
+        si(operacion == operaciones_grupo2[i]){
+            retornar 2;
+        }
+    }
+    
+    retornar -1; // Operación no válida
+}
+
+funcion es_numero_valido(cadena){
+    longitud = longitud_cadena(cadena);
+    indice = 0;
+    
+    // Permitir signo negativo
+    si(cadena[0] == '-') indice = 1;
+    
+    para(; indice < longitud; indice++){
+        si(cadena[indice] < '0' O cadena[indice] > '9'){
+            retornar falso;
+        }
+    }
+    
+    retornar verdadero;
+}
+
+// Funciones de impresión
+funcion imprimir_encabezado_tabla(){
+    imprimir formato("%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s\n",
+           "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
+    imprimir("--------------------------------------------------------------------------------\n");
+}
+
+funcion imprimir_fila_correcta(){
+    imprimir formato("%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s\n",
+           reg_id, reg_pc, reg_ax, reg_bx, reg_cx, reg_dx,
+           reg_proceso, reg_ir, "Correcto");
+}
+
+funcion imprimir_fila_con_error(mensaje_error){
+    imprimir formato("%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s\n",
+           reg_id, reg_pc, reg_ax, reg_bx, reg_cx, reg_dx,
+           reg_proceso, reg_ir, mensaje_error);
+}
+
+funcion imprimir_error(mensaje){
+    imprimir("[ERROR] " + mensaje + "\n");
 }

@@ -1,0 +1,2 @@
+MOV Ax,10
+DIV Ax,0

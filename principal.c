@@ -5,25 +5,31 @@
  * @date 2025
  */
 
-#include "include/interprete.h"
-#include "include/alu.h"
-#include "include/imprimir.h"
-
-
+#include "interprete.h"
+#include "alu.h"
+#include "imprimir.h"
 
 int main(){
     char comando[TAMANIO_COMANDO];
     int resultado;
     
-    while (1) {
+    while (1){
         printf(">> ");
         
-        fgets(comando, sizeof(comando), stdin);
+        if (fgets(comando, sizeof(comando), stdin) == NULL){
+            printf("\nError leyendo entrada\n");
+            break;
+        }
+        
+        if (comando[strlen(comando)-1] == '\n'){
+            comando[strlen(comando)-1] = '\0';
+        }
+        
         resultado = interprete(comando);
         
-        if (resultado == 1) {
+        if (resultado == 1){
             break;
-        } else if (resultado == -1) {
+        } else if (resultado == -1){
             printf("Error procesando comando\n");
         }
     }
