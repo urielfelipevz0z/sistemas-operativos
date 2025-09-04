@@ -3,26 +3,13 @@
  * @brief Programa principal del simulador de sistema operativo
  * @author Equipo: Los sistématicos
  * @date 2025
+ * gcc -I. principal.c src/alu.c src/imprimir.c src/interprete.c -o so
  */
 
-/**
- * Compilación del proyecto versión detallada que hace make:
-
-gcc -Iinclude -c principal.c -o build/principal.o
-gcc -Iinclude -c src/alu.c -o build/alu.o
-gcc -Iinclude -c src/interprete.c -o build/interprete.o
-gcc -Iinclude -c src/imprimir.c -o build/imprimir.o
-gcc build/principal.o build/alu.o build/interprete.o build/imprimir.o -o bin/sistema_operativo
-
-* Compilación del proyecto versión simplificada:
-
-gcc principal.c src/alu.c src/interprete.c src/imprimir.c -o bin/sistema_operativo -Iinclude
-
- */
-
-#include "interprete.h"
-#include "alu.h"
-#include "imprimir.h"
+#include "include/interprete.h"
+#include "include/alu.h"
+#include "include/imprimir.h"
+#include <string.h>
 
 int main(){
     char comando[TAMANIO_COMANDO];
@@ -35,10 +22,7 @@ int main(){
             printf("\nError leyendo entrada\n");
             break;
         }
-        
-        if (comando[strlen(comando)-1] == '\n'){
-            comando[strlen(comando)-1] = '\0';
-        }
+        comando[strcspn(comando, "\n")] = 0;
         
         resultado = interprete(comando);
         

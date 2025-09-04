@@ -1,5 +1,5 @@
-#include "alu.h"
-#include "imprimir.h"
+#include "include/alu.h"
+#include "include/imprimir.h"
 
 int reg_ax = 0;
 int reg_bx = 0;

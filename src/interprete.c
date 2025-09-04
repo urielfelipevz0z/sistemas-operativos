@@ -1,7 +1,7 @@
-#include "interprete.h"
-#include "alu.h"
-#include "imprimir.h"
-#include "globales.h"
+#include "include/interprete.h"
+#include "include/alu.h"
+#include "include/imprimir.h"
+#include "include/globales.h"
 #include <stdlib.h>
 
 int reg_id = 0;
@@ -19,7 +19,7 @@ int interprete(char *comando){
     }
     
     if(strcmp("ejecuta", token) == 0){
-        token = strtok(NULL, "\0");
+        token = strtok(NULL, "\0"); // ejecuta a.asm/0
         if (token == NULL){
             imprimirError("Falta especificar archivo");
             return 0;
@@ -29,7 +29,7 @@ int interprete(char *comando){
         reg_bx = 0;
         reg_cx = 0;
         reg_dx = 0;
-        reg_pc = 1;
+        reg_pc = 0;
         strcpy(reg_ir, "");
         strcpy(reg_proceso, token);
         
@@ -48,7 +48,7 @@ int interprete(char *comando){
     }
 }
 
-int leerArchivo(char *nombre_archivo){
+int leerArchivo(char *nombre_archivo){  //a.asm
     FILE *archivo = fopen(nombre_archivo, "r");
     if (archivo == NULL){
         imprimirError("Archivo no encontrado");
@@ -56,36 +56,34 @@ int leerArchivo(char *nombre_archivo){
     }
 
     char linea[TAMANIO_LINEA];
-    reg_pc = 1;
+    reg_pc = 1;     //Reinicio de PC
     
-    imprimirEncabezado();
+    imprimirTabla();
     
-    while (fgets(linea, sizeof(linea), archivo) != NULL){
-        if (linea[strlen(linea)-1] == '\n'){
-            linea[strlen(linea)-1] = '\0';
-        }
+    while (fgets(linea, sizeof(linea), archivo) != NULL){   //linea = MOV Ax,7 o INC Ax
+        linea[strcspn(linea, "\n")] = 0;
         
         strcpy(reg_ir, linea);
         
         char copia[TAMANIO_LINEA];
         strcpy(copia, linea);
-        char *token = strtok(copia, " ");
+        char *token = strtok(copia, " ");       //token = MOV
         
         if (token == NULL){
             continue;
         }
         
-        int tipo_op = tipoOperacion(token);
+        int tipo_op = tipoOperacion(token);     //1 o 2
         
         
-        char *operandos = strtok(NULL, "");
+        char *operandos = strtok(NULL, "");     //Ax,7
         if (operandos == NULL){
             imprimirFilaConError("Cantidad incorrecta de operandos");
             continue;
         }
 
         if (tipo_op == 1){
-            analizadorGpo1(token, operandos);
+            analizadorGpo1(token, operandos);   //MOV y Ax,7
         } else if (tipo_op == 2){
             analizadorGpo2(token, operandos);
         } else{
@@ -98,14 +96,16 @@ int leerArchivo(char *nombre_archivo){
     return 0;
 }
 
-void analizadorGpo1(char *tipo_operacion, char *operandos){
-    if (strchr(operandos, '.') != NULL){
+void analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
+    if (strchr(operandos, '.') != NULL){    //cadena[] = {'.','@','_','-',';',':','+','*','/','!'}
         imprimirFilaConError("Separador incorrecto");
         return;
     }
+
     
-    char *registro = strtok(operandos, ",");
-    char *valor = strtok(NULL, "");
+    
+    char *registro = strtok(operandos, ",");       //Ax
+    char *valor = strtok(NULL, "");                 //7
     
     if (valor == NULL){
         imprimirFilaConError("Cantidad incorrecta de operandos");
@@ -130,13 +130,13 @@ void analizadorGpo1(char *tipo_operacion, char *operandos){
     // No imprimir nada si hubo error, ya se manejó en aluGpo1
 }
 
-void analizadorGpo2(char *tipo_operacion, char *registro){
+void analizadorGpo2(char *tipo_operacion, char *registro){  //INC y Ax
     if (registro == NULL){
         imprimirFilaConError("Cantidad incorrecta de operandos");
         return;
     }
     
-    if (strchr(registro, ',') != NULL){
+    if (strchr(registro, ',') != NULL){                 //Ax,7 -> truena
         imprimirFilaConError("Cantidad incorrecta de operandos");
         return;
     }
@@ -152,7 +152,7 @@ void analizadorGpo2(char *tipo_operacion, char *registro){
     }
 }
 
-int validarRegistro(const char *registro){
+int validarRegistro(const char *registro){      //Ax, Bx, etc.
     for (int i = 0; i < NUM_REGISTROS; i++) {
         if (strcmp(REGISTROS[i], registro) == 0){
             return i;
@@ -161,7 +161,7 @@ int validarRegistro(const char *registro){
     return -1;
 }
 
-int tipoOperacion(const char *operacion){
+int tipoOperacion(const char *operacion){       //MOV
     for (int i = 0; i < NUM_OPS_GPO1; i++){
         if (strcmp(OPERACIONES_GPO1[i], operacion) == 0){
             return 1;
@@ -177,17 +177,17 @@ int tipoOperacion(const char *operacion){
     return -1;
 }
 
-int esNumeroValido(const char *str){
+int esNumeroValido(const char *str){ // Ax, Z, A, 8, as, 1026,   234A -3
     int len = strlen(str);
     int i = 0;
     
-    if (str[0] == '-') i = 1;
+    if (str[0] == '-') i = 1;       //Acepta los negativos
     
     for (; i < len; i++){
-        if (str[i] < '0' || str[i] > '9'){
+        if (str[i] < '0' || str[i] > '9'){ //0,1,2,3,4,5,6,7,8,9
             return 0;
         }
     }
-    
+
     return 1;
 }

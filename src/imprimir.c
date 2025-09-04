@@ -1,5 +1,5 @@
-#include "imprimir.h"
-#include "globales.h"
+#include "include/imprimir.h"
+#include "include/globales.h"
 
 void imprimirEncabezado(void){
     printf("%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s\n",
