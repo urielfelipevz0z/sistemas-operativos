@@ -9,8 +9,6 @@
 #include "include/alu.h"
 #include "include/imprimir.h"
 
-
-
 int main(){
     char comando[TAMANIO_COMANDO];
     int resultado;
@@ -26,7 +24,6 @@ int main(){
         } else if (resultado == -1) {
             printf("Error procesando comando\n");
         }
-    printf("Ax = %d, Bx = %d, Cx = %d, Dx = %d\n", reg_ax, reg_bx, reg_cx, reg_dx);
     }
 
     printf("Sistema terminado.\n");

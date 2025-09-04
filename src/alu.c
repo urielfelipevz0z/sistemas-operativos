@@ -12,16 +12,17 @@
 #include "include/interprete.h"
 #include "include/imprimir.h"
 
-int reg_ax;
-int reg_bx;
-int reg_cx;
-int reg_dx;
+int reg_id = 0;
+int reg_pc = 1;
 
-int reg_pc;
-char reg_ir[16];
+int reg_ax = 0;
+int reg_bx = 0;
+int reg_cx = 0;
+int reg_dx = 0;
 
-int reg_id;
 char reg_proceso[16];
+char reg_ir[16];
+char status[64];
 
 int aluGpo1(char *tipo_operacion, char *registro, int *dato){
         /* Operación Move */
@@ -143,7 +144,7 @@ int aluGpo1(char *tipo_operacion, char *registro, int *dato){
         }
     }
 }
-    
+
 int aluGpo2(char *tipo_operacion, char *registro){
     /* Operación Incremento */
     if (strcmp(OP_INC, tipo_operacion) == 0){

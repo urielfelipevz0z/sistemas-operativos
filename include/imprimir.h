@@ -10,6 +10,7 @@
 #define ANCHO_COLUMNA_STATUS 25
 
 void imprimirEncabezado(void);
-void imprimirEstadoSistema(int mostrar_solo_encabezado);
+void imprimirEstadoSistema(void/*int mostrar_solo_encabezado*/);
 void imprimirEstadoCompleto(void);
 void imprimirError(int codigoError);
+void imprimirLineaFinal(void);

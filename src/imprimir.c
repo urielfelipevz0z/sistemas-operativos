@@ -10,6 +10,11 @@
 
 
 void imprimirEncabezado(void){
+        for (int i = 0; i < 80; i++){
+        printf("-");
+    }
+    printf("\n");
+
     printf("%-*s %-*s %-*s %-*s %-*s %-*s %-*s %-*s %s\n",
            ANCHO_COLUMNA_ID, "ID",
            ANCHO_COLUMNA_PC, "PC",
@@ -27,11 +32,11 @@ void imprimirEncabezado(void){
     printf("\n");
 }
 
-void imprimirEstadoSistema(int mostrar_solo_encabezado){
-    if (mostrar_solo_encabezado){
+void imprimirEstadoSistema(void/*int mostrar_solo_encabezado*/){
+    /*if (mostrar_solo_encabezado){
         imprimirEncabezado();
         return;
-    }
+    }*/
 
         printf("%-*d %-*d %-*d %-*d %-*d %-*d %-*s %-*s\n",
             ANCHO_COLUMNA_ID, reg_id,
@@ -44,9 +49,15 @@ void imprimirEstadoSistema(int mostrar_solo_encabezado){
             ANCHO_COLUMNA_IR, reg_ir);
 }
 
-void imprimirEstadoCompleto(void){
+/*void imprimirEstadoCompleto(void){
     imprimirEncabezado();
     imprimirEstadoSistema(0);
+}*/
+void imprimirLineaFinal(void) {
+    for (int i = 0; i < 80; i++) {
+        printf("-");
+    }
+    printf("\n");
 }
 
 void imprimirError(int codigoError){
