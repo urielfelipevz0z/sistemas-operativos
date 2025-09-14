@@ -34,7 +34,7 @@ int aluGpo1(char *operacion, char *registro, int *valor){
     }else if (strcmp("DIV", operacion) == 0){
         if (*valor == 0){
             reg_pc--;
-            imprimirFilaConError("División por cero");
+            imprimirFilaConError("Division por cero");
             return -1;
         }
         *reg /= *valor;

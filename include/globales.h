@@ -11,4 +11,6 @@ extern char reg_ir[16];
 
 extern int reg_id;
 extern char reg_proceso[16];
+
+
 #endif
