@@ -1,5 +1,4 @@
-#include "include/imprimir.h"
-#include "include/globales.h"
+#include "include/controlador.h"
 
 void imprimirEncabezado(void){
     printf("%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s\n",

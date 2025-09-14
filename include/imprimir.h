@@ -1,7 +1,7 @@
 #ifndef IMPRIMIR_H
 #define IMPRIMIR_H
 
-#include <stdio.h>
+#include "include/controlador.h"
 
 void imprimirEncabezado(void);
 void imprimirFila(void);

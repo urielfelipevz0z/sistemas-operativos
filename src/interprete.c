@@ -1,54 +1,22 @@
-#include "include/interprete.h"
-#include "include/alu.h"
-#include "include/imprimir.h"
-#include "include/globales.h"
-#include <stdlib.h>
-
-int reg_id = 0;
-char reg_proceso[16] = "";
-int reg_pc = 0;
-char reg_ir[16] = "";
+#include "include/controlador.h"
 
 int interprete(char *comando){    
-    char copia[TAMANIO_COMANDO];
-    strcpy(copia, comando);
-    char *token = strtok(copia, " ");
+    buffer *bufferC = NULL;
+    bufferC = (buffer *)malloc(sizeof(buffer));
+    limpiarBuffer(bufferC);
+    strcpy(bufferC->comandoCompleto, comando);
     
-    if (token == NULL){
+    if(extraerComando(bufferC) == -1){
         return 0;
     }
     
-    if(strcmp("ejecuta", token) == 0){
-        token = strtok(NULL, "\0"); // ejecuta a.asm/0
-        if (token == NULL){
-            imprimirError("Falta especificar archivo");
-            return 0;
-        }
-        
-        reg_ax = 0;
-        reg_bx = 0;
-        reg_cx = 0;
-        reg_dx = 0;
-        reg_pc = 0;
-        strcpy(reg_ir, "");
-        strcpy(reg_proceso, token);
-        
-        if (leerArchivo(token) == -1){
-            reg_id--;
-            strcpy(reg_proceso, "");
-        }
-
-        reg_id++;
-        return 0;
-    } else if(strcmp("salir", token) == 0){
-        return 1;
-    } else{
-        imprimirError("Comando no reconocido");
-        return 0;
-    }
+    reg_ax, reg_bx, reg_cx, reg_dx, reg_pc= 0; 
+    return 0;
 }
 
+
 int leerArchivo(char *nombre_archivo){  //a.asm
+    reg_id++;
     FILE *archivo = fopen(nombre_archivo, "r");
     if (archivo == NULL){
         imprimirError("Archivo no encontrado");
@@ -102,8 +70,6 @@ void analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
         return;
     }
 
-    
-    
     char *registro = strtok(operandos, ",");       //Ax
     char *valor = strtok(NULL, "");                 //7
     

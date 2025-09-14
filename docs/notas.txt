@@ -66,11 +66,11 @@ return 1;
 principal.c 
     - controlador.c
         - interprete.c
-            - comando.c
-            - manejador_archivos.c
-            - instrucciones.c
-                - alu.c
-
+            - comando.c                 //extraerComando, limpiarBuffer ✅✖️
+            - manejador_archivos.c      //leerArchivo ✖️ la mesma✖️
+            - instrucciones.c           //analizadorGpo1, analizadorGpo2, ✖️
+                - validar.c             //validarRegistro, tipoOperacion, esNumeroValido, obtenerRegistro ✖️
+                - alu.c                 //aluGpo1, aluGpo2 ✅
 
 
 
@@ -78,7 +78,7 @@ principal.c
 
 Para las estructuras crear un nuevo .h
 1.- Crear estructura para los registros (Ax, Bx, Cx, Dx, PC, Ir, Proceso)
-2.- Crear estructura para el buffer (ejecuta a.asm)
+2.- Crear estructura para el buffer (ejecuta a.asm)         //✅
 5.- Crear estructura para los estados   
 6.- Crear estructura para las operaciones
 
@@ -87,3 +87,4 @@ Crear nuevos archivos .c: comando.c, manejador_archivos.c, instrucciones.c //???
     Separar responsabilidades de Controlador[interprete.c {comando.c, manejador_archivos.c, instrucciones.c}]
 
 4.- principal.c menor cantidad de lineas posibles
+7.- Crear nuevo archivo para INICIALIZAR TODO 😉

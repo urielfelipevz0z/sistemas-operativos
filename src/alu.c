@@ -1,10 +1,4 @@
-#include "include/alu.h"
-#include "include/imprimir.h"
-
-int reg_ax = 0;
-int reg_bx = 0;
-int reg_cx = 0;
-int reg_dx = 0;
+#include "include/controlador.h"
 
 int *obtenerRegistro(const char *nombre){
     if (strcmp("Ax", nombre) == 0) return &reg_ax;

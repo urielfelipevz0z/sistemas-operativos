@@ -6,10 +6,7 @@
  * gcc -I. principal.c src/alu.c src/imprimir.c src/interprete.c -o so
  */
 
-#include "include/interprete.h"
-#include "include/alu.h"
-#include "include/imprimir.h"
-#include <string.h>
+#include "include/controlador.h"
 
 int main(){
     char comando[TAMANIO_COMANDO];
