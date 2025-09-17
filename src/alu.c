@@ -1,13 +1,5 @@
 #include "include/controlador.h"
 
-int *obtenerRegistro(const char *nombre){
-    if (strcmp("Ax", nombre) == 0) return &reg_ax;
-    if (strcmp("Bx", nombre) == 0) return &reg_bx;
-    if (strcmp("Cx", nombre) == 0) return &reg_cx;
-    if (strcmp("Dx", nombre) == 0) return &reg_dx;
-    return NULL;
-}
-
 int aluGpo1(char *operacion, char *registro, int *valor){
     int *reg = obtenerRegistro(registro);
     if (reg == NULL){

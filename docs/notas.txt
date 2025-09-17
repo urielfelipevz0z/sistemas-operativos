@@ -66,12 +66,11 @@ return 1;
 principal.c 
     - controlador.c
         - interprete.c
-            - comando.c                 //extraerComando, limpiarBuffer ✅✖️
-            - manejador_archivos.c      //leerArchivo ✖️ la mesma✖️
-            - instrucciones.c           //analizadorGpo1, analizadorGpo2, ✖️
-                - validar.c             //validarRegistro, tipoOperacion, esNumeroValido, obtenerRegistro ✖️
+            - comando.c                 //extraerComando, limpiarBuffer ✅✅
+            - manejador_archivos.c      //leerArchivo ✅
+            - instrucciones.c           //analizadorGpo1, analizadorGpo2 ✅✅
+                - validar.c             //validarRegistro, tipoOperacion, esNumeroValido, obtenerRegistro ✅✅✅✅
                 - alu.c                 //aluGpo1, aluGpo2 ✅
-
 
 
 //Re-estructuración
@@ -88,3 +87,24 @@ Crear nuevos archivos .c: comando.c, manejador_archivos.c, instrucciones.c //???
 
 4.- principal.c menor cantidad de lineas posibles
 7.- Crear nuevo archivo para INICIALIZAR TODO 😉
+
+// Implementación de ncurses
+# Funciones básicas de ncurses a utilizar:
+initscr();            // Inicializa la pantalla
+mvprintw(y, x, "Texto"); // Mueve el cursor a la posición (y, x) y imprime "Texto"
+refresh();           // Actualiza la pantalla para reflejar los cambios realizados
+endwin();            // Finaliza el modo ncurses y restaura la terminal a su estado original
+
+## Funciones que podrían ser útiles:
+cbreak();            // Desactiva el buffer de línea, permitiendo la entrada de caracteres uno por uno.
+noecho();            // Desactiva la visualización de los caracteres ingresados por el usuario
+keypad(stdscr, TRUE); // Habilita la captura de teclas especiales (como las flechas) en la ventana estándar.
+clear();             // Limpia la pantalla
+getstr(str);      // Lee una cadena de caracteres desde la entrada estándar (similar a scanf, pero más seguro)
+getch();            // Lee un solo carácter desde la entrada estándar
+
+# Variables de ncurses
+WINDOW *win;          // Puntero a una ventana de ncurses que se pasa a initscr() para inicializar la pantalla.
+
+Estrategia de implementación:
+Usar variable apuntador window *window de modo "extern"
