@@ -43,7 +43,9 @@ int leerArchivo(char *nombre_archivo){  //a.asm
             continue;
         }
     }
-
+    refresh();
+    mvprintw(6,0,"Archivo finalizado\n");
+    
     fclose(archivo);
     return 0;
 }

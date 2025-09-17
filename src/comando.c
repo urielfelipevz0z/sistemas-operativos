@@ -36,15 +36,8 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
 }
 
 void leerComando(char *comando){
-    if (fgets(comando, TAMANIO_COMANDO, stdin) == NULL){
-        printf("\nError leyendo entrada\n");
-        comando[0] = '\0'; // Indica error
-        return;
-    }
-    comando[strcspn(comando, "\n")] = 0;
-    
+    getstr(comando);
     interprete(comando);
-
 }
 
 void limpiarBuffer(buffer *bufferC) {
