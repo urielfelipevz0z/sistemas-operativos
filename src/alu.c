@@ -1,18 +1,4 @@
-#include "include/alu.h"
-#include "include/imprimir.h"
-
-int reg_ax = 0;
-int reg_bx = 0;
-int reg_cx = 0;
-int reg_dx = 0;
-
-int *obtenerRegistro(const char *nombre){
-    if (strcmp("Ax", nombre) == 0) return &reg_ax;
-    if (strcmp("Bx", nombre) == 0) return &reg_bx;
-    if (strcmp("Cx", nombre) == 0) return &reg_cx;
-    if (strcmp("Dx", nombre) == 0) return &reg_dx;
-    return NULL;
-}
+#include "include/controlador.h"
 
 int aluGpo1(char *operacion, char *registro, int *valor){
     int *reg = obtenerRegistro(registro);
