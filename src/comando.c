@@ -14,6 +14,7 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
 
     if(strcmp("salir", bufferC->comando) == 0){
         printf("Saliendo...\n");
+        endwin();
         exit(0);
     }
     else if(strcmp("ejecuta", bufferC->comando) == 0){  //ejecuta

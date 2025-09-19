@@ -11,7 +11,7 @@ void imprimirFila(void){
     mvprintw(4,0,"%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s\n",
            reg_id, reg_pc, reg_ax, reg_bx, reg_cx, reg_dx, 
            reg_proceso, reg_ir, "Correcto");
-           refresh();
+           refresh();   
            getch();
 }
 void imprimirFilaConError(char *mensaje_error){
