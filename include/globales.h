@@ -5,6 +5,7 @@ extern int reg_ax;
 extern int reg_bx;
 extern int reg_cx;
 extern int reg_dx;
+extern int reg_Zf;
 
 extern int reg_pc;
 extern char reg_ir[16];

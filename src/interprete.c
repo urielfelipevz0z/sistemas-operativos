@@ -56,7 +56,7 @@ int leerArchivo(char *nombre_archivo){  //a.asm
     }
 
     char linea[TAMANIO_LINEA];
-    reg_pc = 1;     //Reinicio de PC
+    reg_pc = 0;     //Reinicio de PC
     
     imprimirTabla();
     
@@ -73,11 +73,19 @@ int leerArchivo(char *nombre_archivo){  //a.asm
             continue;
         }
         
+        if (strcmp("END", token) == 0){
+            imprimirFilaConError("Instruccion END encontrada, cierre del documento");
+            fclose(archivo);
+            reg_pc++;
+            return 0;
+        }
+        
         int tipo_op = tipoOperacion(token);     //1 o 2
         
         
         char *operandos = strtok(NULL, "");     //Ax,7
         if (operandos == NULL){
+		reg_pc++;
             imprimirFilaConError("Cantidad incorrecta de operandos");
             continue;
         }
@@ -87,6 +95,7 @@ int leerArchivo(char *nombre_archivo){  //a.asm
         } else if (tipo_op == 2){
             analizadorGpo2(token, operandos);
         } else{
+		reg_pc++;
             imprimirFilaConError("Instrucción no reconocida");
             continue;
         }
@@ -97,8 +106,10 @@ int leerArchivo(char *nombre_archivo){  //a.asm
 }
 
 void analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
-    if (strchr(operandos, '.') != NULL){    //cadena[] = {'.','@','_','-',';',':','+','*','/','!'}
-        imprimirFilaConError("Separador incorrecto");
+//printf("tipo: %s y operando: %s\n", tipo_operacion, operandos);
+if (strchr(operandos, '.') != NULL){    //cadena[] = {'.','@','_','-',';',':','+','*','/','!'}
+        reg_pc++;
+	imprimirFilaConError("Separador incorrecto");
         return;
     }
 
@@ -106,18 +117,22 @@ void analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
     
     char *registro = strtok(operandos, ",");       //Ax
     char *valor = strtok(NULL, "");                 //7
-    
+  //  printf("reg: %s, valor:%s\n",registro,valor);
     if (valor == NULL){
+	reg_pc++;
         imprimirFilaConError("Cantidad incorrecta de operandos");
         return;
     }
-    
+   // printf("registro: %s\n", registro);
     if (validarRegistro(registro) == -1){
+//printf("NOOOO\n");
+	reg_pc++;
         imprimirFilaConError("Registro inválido");
         return;
     }
     
     if (!esNumeroValido(valor)){
+	reg_pc++;
         imprimirFilaConError("Uso incorrecto de valores");
         return;
     }
@@ -131,17 +146,21 @@ void analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
 }
 
 void analizadorGpo2(char *tipo_operacion, char *registro){  //INC y Ax
-    if (registro == NULL){
+  //  printf("Entre al analizador gp2\n");
+	if (registro == NULL){
+	reg_pc++;
         imprimirFilaConError("Cantidad incorrecta de operandos");
         return;
     }
     
     if (strchr(registro, ',') != NULL){                 //Ax,7 -> truena
+	reg_pc++;
         imprimirFilaConError("Cantidad incorrecta de operandos");
         return;
     }
     
     if (validarRegistro(registro) == -1){
+	reg_pc++;
         imprimirFilaConError("Registro inválido");
         return;
     }
@@ -155,9 +174,12 @@ void analizadorGpo2(char *tipo_operacion, char *registro){  //INC y Ax
 int validarRegistro(const char *registro){      //Ax, Bx, etc.
     for (int i = 0; i < NUM_REGISTROS; i++) {
         if (strcmp(REGISTROS[i], registro) == 0){
-            return i;
+//	printf("REGISTRO: %s, compararcion: %s\n", REGISTROS[i], registro);
+  //      printf("Valor de i:%d\n",i);    
+	return i;
         }
     }
+//printf("Retorno de -1\n");
     return -1;
 }
 

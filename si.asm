@@ -1,0 +1,5 @@
+MOV Ax,0
+ADD Ax,7
+SUB Ax,7
+
+
