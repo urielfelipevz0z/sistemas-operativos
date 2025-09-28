@@ -108,3 +108,69 @@ WINDOW *win;          // Puntero a una ventana de ncurses que se pasa a initscr(
 
 Estrategia de implementación:
 Usar variable apuntador window *window de modo "extern"
+
+
+
+Entrega Dois:
+
+1.- Agregar comando END (FACILLL)
+2.- Crear estructuta PCB (Process control block)
+    -Id, Pc, Ax, Bx, Cx, Dx, Ir, Estado, Nombre(tipo char nombre del archivo), *FILE archivo, *PCB siguiente
+3.- Agregar Funciones de Listas 
+    -Crear, insertar, desligar, mover entre listas, recorrer lista, eliminar[al mero final]
+4.- Impresiones mamalonas con ncurses
+    -
+
+
+//manejador_archivos.c  Funcion que quita los espacios en blanco de "MOV Ax , 7"
+int i = 0, j = 0;
+        strtok(NULL, "#"); Ax  ,  7
+        while(operandos[i] != '\0'){
+            if(operandos[i] != ' '){
+                aux1[j] = operandos[i];     Ax,7'\0'
+                j++;
+            }
+            i++;
+        }
+        aux1[j] = '\0';
+        // printf("ope: %s, aux: %s\n",operandos, aux1);
+        strcpy(operandos,aux1);
+        
+        
+        //strcpy(operandos, aux1);
+
+
+// en interprete.c Funcion END del examen.
+if (strcmp("END", token) == 0){
+    bandera = 1;
+    imprimirFilaConError("Instruccion END encontrada, cierre del documento");
+    fclose(archivo);
+    reg_pc++;
+    return 0;
+}
+
+
+// comando.c    Funcion que solo acepta cadenas archivos *.asm
+	if(strcmp(bufferC->argumento,strtok(token, ".")) == 0){     //a.asm
+	    imprimirError("Falta especificar extension");
+	    return -1;
+	}
+	extension = strtok(NULL,".");	//asm
+	if(extension == NULL){
+	    imprimirError("Falta especificar extension");
+	    return -1;
+	}
+	if(strcmp("asm", extension) != 0){
+	    imprimirError("Extension invalida");
+	    return -1;
+	}
+        strcpy(reg_ir, "");
+        strcpy(reg_proceso, bufferC->argumento);
+
+		
+
+
+
+
+
+

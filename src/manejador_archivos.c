@@ -25,6 +25,8 @@ int leerArchivo(char *nombre_archivo){  //a.asm
         if (token == NULL){
             continue;
         }
+
+        //
         
         int tipo_op = tipoOperacion(token);     //1 o 2
         

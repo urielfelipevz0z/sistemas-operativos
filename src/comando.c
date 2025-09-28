@@ -23,8 +23,12 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
             return -1;
         }
         strcpy(bufferC->argumento, token); // a.asm
+
+        
+
+
         strcpy(reg_ir, "");
-        strcpy(reg_proceso, bufferC->argumento);
+        strcpy(reg_proceso, bufferC->argumento); //a.asm
 
         if (leerArchivo(bufferC->argumento) == -1){     //a.asm
         reg_id--;

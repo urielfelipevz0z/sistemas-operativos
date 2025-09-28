@@ -7,3 +7,10 @@ MUL Dx,2
 DIV Ax,2
 INC Ax
 DEC Cx
+END
+
+
+DIV Ax,2
+INC Ax
+DEC Cx
+END
