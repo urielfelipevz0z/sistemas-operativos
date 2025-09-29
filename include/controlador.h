@@ -6,13 +6,14 @@
 #include <string.h>
 #include <ncurses.h>
 
-#include "include/globales.h"
-#include "include/alu.h"
-#include "include/imprimir.h"
-#include "include/interprete.h"
-#include "include/comando.h"
-#include "include/manejador_archivos.h"
-#include "include/instrucciones.h"
-#include "include/validar.h"
+#include "include/globales.h"                       //Contiene la var. globales
+#include "include/alu.h"                            //Controla la alu
+#include "include/imprimir.h"                       //Imprime
+#include "include/interprete.h"                     //Inicializa la estructura buffer
+#include "include/comando.h"                        //Resuelve el comando
+#include "include/controlador_procesos.h"           //Realiza las funciones de una lista
+#include "include/instrucciones.h"                  //Analizadores de Gpo1 y Gpo2
+#include "include/validar.h"                        //Valida las cosas :)
+#include "include/leer_archivo.h"                   //quien sabe xd
 
 #endif

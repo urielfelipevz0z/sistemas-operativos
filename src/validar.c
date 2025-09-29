@@ -47,3 +47,25 @@ int *obtenerRegistro(const char *nombre){
     if (strcmp("Dx", nombre) == 0) return &reg_dx;
     return NULL;
 }
+
+int comprobarAsm(char *proceso, char *token){
+    char *extension;
+    if(strcmp(".",proceso) == 0){
+        imprimirError("Falta especificar extension");
+        return -1;
+    }
+    if(strcmp(proceso,strtok(token, ".")) == 0){     //a.asm
+        imprimirError("Falta especificar extension");
+        return -1;
+    }
+    extension = strtok(NULL,".");	//asm
+    if(extension == NULL){
+        imprimirError("Falta especificar extension");
+        return -1;
+    }
+    if(strcmp("asm", extension) != 0){
+        imprimirError("Extension invalida");
+        return -1;
+    }
+    return 0;
+}

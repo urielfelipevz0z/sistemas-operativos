@@ -3,7 +3,7 @@
  * @brief Programa principal del simulador de sistema operativo
  * @author Equipo: Los sistématicos
  * @date 2025
- * gcc -I. principal.c src/alu.c src/imprimir.c src/interprete.c src/comando.c src/globales.c src/manejador_archivos.c src/instrucciones.c src/validar.c -lncurses -o sistematicos
+ * gcc -I. principal.c src/alu.c src/imprimir.c src/interprete.c src/comando.c src/globales.c src/controlador_procesos.c src/instrucciones.c src/leer_archivo.c src/validar.c -lncurses -o sistematicos
  * ./sistematicos
  */
 
@@ -22,7 +22,6 @@ int main(){
         mvprintw(0, 0, ">> ");      //imprime en un lugar en especifico
         leerComando(comando);
         refresh();                  //actualiza la pantalla
-        getch();                    //utilizada para hacer pausas
-    }
-    
+        getch();                  //utilizada para hacer pausas
+    }   
 }

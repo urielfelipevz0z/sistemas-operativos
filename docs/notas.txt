@@ -67,13 +67,16 @@ principal.c
     - controlador.c
         - interprete.c
             - comando.c                 //extraerComando, limpiarBuffer ✅✅
-            - manejador_archivos.c      //leerArchivo ✅
-            - instrucciones.c           //analizadorGpo1, analizadorGpo2 ✅✅
-                - validar.c             //validarRegistro, tipoOperacion, esNumeroValido, obtenerRegistro ✅✅✅✅
-                - alu.c                 //aluGpo1, aluGpo2 ✅
-
+            - controlador_procesos.c      //crearPr, insertarPr, moverPr, desligarPr, recorrerLista, imprimirPr, eliminarPr 
+                -leer_proceso.c         //leerProceso ✅
+                    - instrucciones.c           //analizadorGpo1, analizadorGpo2 ✅✅
+                        - validar.c             //validarRegistro, tipoOperacion, esNumeroValido, obtenerRegistro ✅✅✅✅
+                        - alu.c                 //aluGpo1, aluGpo2 ✅
+    
+    ejecuta a.asm b.asm c.asm
 
 //Re-estructuración
+
 
 Para las estructuras crear un nuevo .h
 1.- Crear estructura para los registros (Ax, Bx, Cx, Dx, PC, Ir, Proceso)
@@ -81,9 +84,9 @@ Para las estructuras crear un nuevo .h
 5.- Crear estructura para los estados   
 6.- Crear estructura para las operaciones
 
-Crear nuevos archivos .c: comando.c, manejador_archivos.c, instrucciones.c //??????
+Crear nuevos archivos .c: comando.c, controlador_procesos.c, instrucciones.c //??????
 3.- Funcion interprete actualmente: Analiza el buffer, abre el archivo, ejecuta las instrucciones del archivo 
-    Separar responsabilidades de Controlador[interprete.c {comando.c, manejador_archivos.c, instrucciones.c}]
+    Separar responsabilidades de Controlador[interprete.c {comando.c, controlador_procesos.c, instrucciones.c}]
 
 4.- principal.c menor cantidad de lineas posibles
 7.- Crear nuevo archivo para INICIALIZAR TODO 😉
@@ -113,16 +116,19 @@ Usar variable apuntador window *window de modo "extern"
 
 Entrega Dois:
 
-1.- Agregar comando END (FACILLL)
+1.- Agregar comando END (FACILLL)   //✅
 2.- Crear estructuta PCB (Process control block)
     -Id, Pc, Ax, Bx, Cx, Dx, Ir, Estado, Nombre(tipo char nombre del archivo), *FILE archivo, *PCB siguiente
 3.- Agregar Funciones de Listas 
     -Crear, insertar, desligar, mover entre listas, recorrer lista, eliminar[al mero final]
 4.- Impresiones mamalonas con ncurses
-    -
+5.- Solo leer archivos con extencion .asm       //✅
 
 
-//manejador_archivos.c  Funcion que quita los espacios en blanco de "MOV Ax , 7"
+
+
+
+//controlador_procesos.c  Funcion que quita los espacios en blanco de "MOV Ax , 7"
 int i = 0, j = 0;
         strtok(NULL, "#"); Ax  ,  7
         while(operandos[i] != '\0'){

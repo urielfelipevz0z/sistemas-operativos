@@ -1,4 +1,5 @@
 #include "include/controlador.h"
+int bandera = 0;
 
 int leerArchivo(char *nombre_archivo){  //a.asm
     reg_id++;
@@ -14,6 +15,7 @@ int leerArchivo(char *nombre_archivo){  //a.asm
     imprimirTabla();
     
     while (fgets(linea, sizeof(linea), archivo) != NULL){   //linea = MOV Ax,7 o INC Ax
+        bandera = 0;
         linea[strcspn(linea, "\n")] = 0;
         
         strcpy(reg_ir, linea);
@@ -26,7 +28,14 @@ int leerArchivo(char *nombre_archivo){  //a.asm
             continue;
         }
 
-        //
+        if (strcmp("END", token) == 0){
+            bandera = 1;
+            imprimirFilaConError("Terminado por instruccion END");
+            mvprintw(6,0,"Archivo finalizado\n");
+            fclose(archivo);
+            reg_pc++;
+            return 0;
+        }
         
         int tipo_op = tipoOperacion(token);     //1 o 2
         
@@ -45,8 +54,11 @@ int leerArchivo(char *nombre_archivo){  //a.asm
             continue;
         }
     }
-    refresh();
-    mvprintw(6,0,"Archivo finalizado\n");
+    if(bandera == 1){
+        mvprintw(6,0,"Archivo finalizado\n");
+    }else{
+        mvprintw(6,0,"[WARNING]: No se encontró la instruccion END...\n");
+    }
     
     fclose(archivo);
     return 0;

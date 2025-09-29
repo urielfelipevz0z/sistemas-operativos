@@ -14,6 +14,20 @@ typedef struct{
     char argumento[TAMANIO_LINEA];              //a.asm
 }buffer;
 
+typedef struct PCB{
+    int id;
+    int pc;
+    int ax;
+    int bx;
+    int cx;
+    int dx;
+    char ir[16];
+    char estado[10];    // Nuevo, Listo, Terminado(Bien o Mal), Bloqueado, Suspendido
+    char nombre[30]; //nombre del archivo
+    FILE *archivo; //puntero al archivo
+    struct PCB *siguiente; //puntero al siguiente PCB
+}PCB;
+
 extern int reg_ax, reg_bx, reg_cx, reg_dx;
 extern int reg_pc, reg_id;
 extern char reg_proceso[16], reg_ir[16], comando[TAMANIO_COMANDO];
