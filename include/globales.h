@@ -14,7 +14,7 @@ typedef struct{
     char argumento[TAMANIO_LINEA];              //a.asm
 }buffer;
 
-typedef struct PCB{
+typedef struct pcb{
     int id;
     int pc;
     int ax;
@@ -25,12 +25,14 @@ typedef struct PCB{
     char estado[10];    // Nuevo, Listo, Terminado(Bien o Mal), Bloqueado, Suspendido
     char nombre[30]; //nombre del archivo
     FILE *archivo; //puntero al archivo
-    struct PCB *siguiente; //puntero al siguiente PCB
+    struct pcb *siguiente; //puntero al siguiente PCB
 }PCB;
 
 extern int reg_ax, reg_bx, reg_cx, reg_dx;
 extern int reg_pc, reg_id;
 extern char reg_proceso[16], reg_ir[16], comando[TAMANIO_COMANDO];
+
+extern PCB *arreglo_de_listas[3];
 
 static const char *const REGISTROS[] = {"Ax", "Bx", "Cx", "Dx"};
 static const char *const OPERACIONES_GPO1[] = {"MOV", "ADD", "SUB", "MUL", "DIV"};

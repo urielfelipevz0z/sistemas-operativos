@@ -1,6 +1,6 @@
 #ifndef leer_archivo_H
 #define leer_archivo_H
 
-int leerArchivo(char *nombre_archivo);
+int leerArchivo(PCB *proceso);
 
 #endif

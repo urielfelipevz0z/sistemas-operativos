@@ -1,17 +1,17 @@
 #include "include/controlador.h"
 int bandera = 0;
 
-int leerArchivo(char *nombre_archivo){  //a.asm
+int leerArchivo(PCB *proceso){  //a.asm
+    reiniciarRegistros();
     reg_id++;
-    FILE *archivo = fopen(nombre_archivo, "r");
+    FILE *archivo = proceso->archivo;
     if (archivo == NULL){
         imprimirError("Archivo no encontrado");
         return -1;
     }
 
     char linea[TAMANIO_LINEA];
-    reg_pc = 1;     //Reinicio de PC
-    
+
     imprimirTabla();
     
     while (fgets(linea, sizeof(linea), archivo) != NULL){   //linea = MOV Ax,7 o INC Ax
@@ -54,6 +54,7 @@ int leerArchivo(char *nombre_archivo){  //a.asm
             continue;
         }
     }
+
     if(bandera == 1){
         mvprintw(6,0,"Archivo finalizado\n");
     }else{
@@ -63,3 +64,7 @@ int leerArchivo(char *nombre_archivo){  //a.asm
     fclose(archivo);
     return 0;
 }
+
+
+
+

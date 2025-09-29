@@ -10,7 +10,8 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
     }
 
     strcpy(copia, bufferC->comandoCompleto);    //ejecuta a.asm b.asm. n.asm o salir o ejecuta a.asm
-    strcpy(bufferC->comando, strtok(copia, " "));   //ejecuta o salir 
+    strcpy(bufferC->comando, strtok(copia, " "));   //ejecuta o salir
+
     token = strtok(NULL, "");  //a.asm b.asm c.asm
 
     if(strcmp("salir", bufferC->comando) == 0 || strcmp("exit", bufferC->comando) == 0){
@@ -24,20 +25,16 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
             return -1;
         }
         strcpy(bufferC->argumento, token); // a.asm b.asm c.asm Meter while abajo
-        //gestorProcesos(bufferC->argumento, lista listos);
+        
+        gestorProcesos(bufferC->argumento, &(arreglo_de_listas[0]));
 
-        //Solo contempla archivos .asm TODO: meter a una funcion
-        if(comprobarAsm(bufferC->argumento, token)){
-            return -1;
-        }
+        // if(comprobarAsm(bufferC->argumento, token)){
+        //     return -1;
+        // }
 
         strcpy(reg_ir, "");
         strcpy(reg_proceso, bufferC->argumento); //a.asm
 
-        if (leerArchivo(bufferC->argumento) == -1){     //a.asm
-        reg_id--;
-        strcpy(reg_proceso, "");
-        }
     } else{
         imprimirError("Comando no reconocido");
         return -1;
