@@ -1,5 +1,6 @@
 #include "include/controlador.h"
 
+
 int validarRegistro(const char *registro){      //Ax, Bx, etc.
     for (int i = 0; i < NUM_REGISTROS; i++) {
         if (strcmp(REGISTROS[i], registro) == 0){
@@ -48,17 +49,24 @@ int *obtenerRegistro(const char *nombre){
     return NULL;
 }
 
-int comprobarAsm(char *proceso, char *token){
+// Cambiar logica de comprobacion usando strtok(ya no)
+int comprobarAsm(char *proceso){    //a.asm
     char *extension;
-    if(strcmp(".",proceso) == 0){
+    char copia[128];
+    if(proceso == NULL){
+        return -1;
+    }
+    strcpy(copia, proceso);
+
+    if(strcmp(proceso,".") == 0){   //.
         imprimirError("Falta especificar extension");
         return -1;
     }
-    if(strcmp(proceso,strtok(token, ".")) == 0){     //a.asm
+    if(strcmp(proceso,strtok(copia, ".")) == 0){     //a
         imprimirError("Falta especificar extension");
         return -1;
     }
-    extension = strtok(NULL,".");	//asm
+    extension = strtok(NULL,".");	//asm o txt o c o java
     if(extension == NULL){
         imprimirError("Falta especificar extension");
         return -1;

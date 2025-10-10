@@ -32,8 +32,8 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
         //     return -1;
         // }
 
-        strcpy(reg_ir, "");
-        strcpy(reg_proceso, bufferC->argumento); //a.asm
+        // strcpy(reg_ir, "");
+        // strcpy(reg_proceso, bufferC->argumento); //a.asm
 
     } else{
         imprimirError("Comando no reconocido");

@@ -104,7 +104,7 @@ noecho();            // Desactiva la visualización de los caracteres ingresados
 keypad(stdscr, TRUE); // Habilita la captura de teclas especiales (como las flechas) en la ventana estándar.
 clear();             // Limpia la pantalla
 getstr(str);      // Lee una cadena de caracteres desde la entrada estándar (similar a scanf, pero más seguro)
-getch();            // Lee un solo carácter desde la entrada estándar
+usleep(100);;            // Lee un solo carácter desde la entrada estándar
 
 # Variables de ncurses
 WINDOW *win;          // Puntero a una ventana de ncurses que se pasa a initscr() para inicializar la pantalla.

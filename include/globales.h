@@ -1,12 +1,14 @@
 #ifndef GLOBALES_H
 #define GLOBALES_H
 
-#define TAMANIO_COMANDO 256
+#define TAMANIO_COMANDO 100
 #define TAMANIO_LINEA 128
 
 #define NUM_REGISTROS 4
 #define NUM_OPS_GPO1 5
 #define NUM_OPS_GPO2 2
+#define SEGUNDOS 1
+
 
 typedef struct{
     char comandoCompleto[TAMANIO_COMANDO];      //ejecuta a.asm
@@ -39,5 +41,7 @@ static const char *const OPERACIONES_GPO1[] = {"MOV", "ADD", "SUB", "MUL", "DIV"
 static const char *const OPERACIONES_GPO2[] = {"INC", "DEC"};
 
 extern WINDOW *ventana;
+
+extern int tiempo;
 
 #endif
