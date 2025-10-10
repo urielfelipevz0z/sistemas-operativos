@@ -3,8 +3,10 @@
 
 void gestorProcesos(char *argumento, PCB *arreglo_de_listas[]);
 PCB *crear(char *proceso);
-void insertar(char *proceso, PCB *arreglo_de_listas[]);
+void insertar(PCB *arreglo_de_listas[], PCB *nodo);
 void manejador(PCB *arreglo_de_listas[]);
 void eliminar(PCB *arreglo_de_listas[]);
+void imprimirNodo(PCB *arreglo_de_listas[]);
+void imprimirInfo(PCB *nodo);
 
 #endif

@@ -48,13 +48,19 @@ int *obtenerRegistro(const char *nombre){
     return NULL;
 }
 
-int comprobarAsm(char *proceso, char *token){
+int comprobarAsm(char *proceso){       //a.asm
     char *extension;
+    char copia[128];
+    if(proceso == NULL){
+        return -1;
+    }
+    strcpy(copia, proceso);
+
     if(strcmp(".",proceso) == 0){
         imprimirError("Falta especificar extension");
         return -1;
     }
-    if(strcmp(proceso,strtok(token, ".")) == 0){     //a.asm
+    if(strcmp(proceso,strtok(copia, ".")) == 0){     //a.asm
         imprimirError("Falta especificar extension");
         return -1;
     }

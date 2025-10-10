@@ -1,0 +1,24 @@
+1.- Se saco la funcion de crear que se encuentra en la funcion de insertar, ahora se le pasa como argumento y los nodos se crean en el ciclo while de la funcion gestorProcesos(...).
+
+2.- Se edito la funcion insertar eliminando el parametro de "proceso" ya que ahora no es necesaria y se agrego un nuevo parametro del tipo apuntador PCB.
+
+3.- Se creo la funcion de imprimir los nodos
+
+4.- En globales.c las siguientes lineas no cumplen ninguna función
+
+PCB *lista_listos = NULL;
+PCB *lista_ejecucion = NULL;
+PCB *lista_terminados = NULL;
+
+4.- La función manejador(...) tenia un error grave que se pudo apreciar gracias a la implementacion de la función imprimirNodo(...), el error era tal que la lista de ejecucion se llenaba de procesos en bucle uno tras de otro si encolabamos "a.asm b.asm" la lista de ejecucion se veia talque "a.asm -> b.asm -> NULL" siendo que lo correcto seria que solo se tuviese un proceso en dicha lista en algunos casos mas graves podiamos llegar a apreciar "a.asm -> b.asm -> a.asm -> b.asm -> b.asm -> b.asm -> a.asm -> a.asm" impidiendo asi que el programa terminase, entrabamos a un "bucle" infinito, no se logro encontrar el porque de esta situación sin embargo se logro evitar modificando la siguiente linea:
+
+aux = arreglo_de_listas[1];     //Linea existente que no tenia sentido dado a que nunca se cambio la referencia de aux por lo que no es nescesario "reiniciar" dicha referencia, este puede ser uno de los motivos del error.
+
+arreglo_de_listas[1] = NULL;    //Linea actual que corrige el error, se "limpia" la lista de ejecución y se mueve el nodo a la lista de finalizados
+
+5.- La funcion de comprobarAsm(...) es incompatible con el uso de gestorProcesos(...) ya que ambas utilizan strtok, para poder dividir los tokens. Entonces lo que sucede es que si se usa el strtok en la funcion de comprobarAsm se pierde la referencia al arreglo de archivos (a.asm b.asm c.asm) pero por otro lado es necesario utlizarla para lograr dividir el a.asm en nombre de archivo y extension. Ademas fue necesario realizar modificaciones en la funcion de comprobarAsm(...) para que funcionara con un solo argumento. Recomendación cambiar la funcion de comprobarAsm(...) y no la de gestorProcesos(...).
+
+6.- Se creo la función imprimirInfo(...) la cual nos apoya a visualizar los datos que contiene cada uno de los nodos una vez terminada su ejecución.
+
+
+

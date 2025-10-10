@@ -5,6 +5,6 @@ int validarRegistro(const char *registro);
 int tipoOperacion(const char *operacion);
 int esNumeroValido(const char *str);
 int *obtenerRegistro(const char *nombre);
-int comprobarAsm(char *proceso, char *token);
+int comprobarAsm(char *proceso);
 
 #endif
