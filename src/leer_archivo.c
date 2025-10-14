@@ -33,6 +33,7 @@ int leerArchivo(PCB *proceso){  //a.asm
             bandera = 1;
             sprintf(desc, "Archivo %s finalizado por instruccion END", reg_proceso);
             imprimirError(desc);
+            strcpy(reg_estado, "CORRECTO");
             fclose(archivo);
             reg_pc++;
             return 0;

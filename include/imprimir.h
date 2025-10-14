@@ -10,6 +10,7 @@ void imprimirFila(void);
 void imprimirFilaConError(char *mensaje_error);
 void imprimirTabla(void);
 
-void imprimirFilaPr(PCB *nodo);
+void imprimirListos(PCB *nodo, int renglon);
+void imprimirTerminados(PCB *nodo, int renglon);
 
 #endif

@@ -64,26 +64,28 @@ void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
     }
 }
 
-void manejador(PCB *arreglo_de_listas[]){ 
+void manejador(PCB *arreglo_de_listas[]){
     PCB *aux; 
     recorrerListas(&(arreglo_de_listas[0]));
+    //imprimir lista de listos
     while (arreglo_de_listas[0] != NULL){ 
         aux = arreglo_de_listas[0]; 
         arreglo_de_listas[0] = aux->siguiente;
         aux->siguiente = NULL;
         insertar(&(arreglo_de_listas[1]), aux); //Se mueve el 1er nodo de listos a ejecución 
+        //imprimir ejecucion
         recorrerListas(&(arreglo_de_listas[0]));
         strcpy(reg_proceso, aux[0].nombre); 
         if (leerArchivo(&aux[0]) == -1){ //a.asm 
             reg_id--; 
             strcpy(reg_proceso, ""); 
         } 
+        
         igualarRegistros(&aux[0]); 
-        //imprimirFilaPr(&aux[0]);
         arreglo_de_listas[1] = NULL;
         insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
         recorrerListas(&(arreglo_de_listas[0]));
-    }     
+    }
 }
 
 void eliminar(PCB *arreglo_de_listas[]){
@@ -110,41 +112,41 @@ void recorrerListas(PCB *arreglo_de_listas[]){
 
     for(int i = 0; i < 3; i++){
         j = 0;
-        if(i == 0){
-            lista = arreglo_de_listas[i];   //lista de listos
-            mvprintw(10,0,"Lista de listos\n");
-            while(lista != NULL){
-                aux = lista;
-                lista = lista->siguiente;
-                mvprintw(11,j,"%s -> ", aux[0].nombre);
-                j+=10;
-                refresh();
-            }
-            mvprintw(11,j,"NULL\n");
-        }
-        else if(i == 1){
+        if(i == 0){ //lista de listos
             lista = arreglo_de_listas[i];
-            mvprintw(13,0,"Lista de ejecucion\n");
+            // Limpia y dibuja la ventana solo una vez
+            werase(ventana->ventana[3]);
+            box(ventana->ventana[3], 0, 0);
+            mvwprintw(ventana->ventana[3], 1, 1, "-----  LISTOS  -----");
+            mvwprintw(ventana->ventana[3],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[3],3,1,"---------------------------------------");
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvprintw(14,j,"%s", aux[0].nombre);
-                j+=10;
-                refresh();
+                mvwprintw(ventana->ventana[3], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
+                    aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx,
+                    aux->nombre, "-", "-");
+                j++;
             }
+            wrefresh(ventana->ventana[3]);
         }
-        else if(i == 2){
+        else if(i == 2){    //Lista de terminados
             lista = arreglo_de_listas[i];
-            mvprintw(16,0,"Lista de finalizados\n");
+            box(ventana->ventana[4], 0, 0);
+            mvwprintw(ventana->ventana[4],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[4],3,1,"---------------------------------------");
+            j = 0;
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvprintw(17,j,"%s -> ", aux[0].nombre);
-                imprimirInfo(aux);
-                j+=10;
-                refresh();
+                mvwprintw(ventana->ventana[4], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
+                    aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx,
+                    aux->nombre, aux->ir, aux->estado);
+                j++;
             }
-            mvprintw(17,j,"NULL\n");
+            wrefresh(ventana->ventana[4]);
         }
     }
 }

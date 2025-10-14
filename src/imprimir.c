@@ -14,7 +14,6 @@ void imprimirEncabezadoEjecucion(void){
     werase(ventana->ventana[2]);
     box(ventana->ventana[2], 0, 0);
     mvwprintw(ventana->ventana[2], 1, 1, "-----  EJECUCION  -----");
-
     mvwprintw(ventana->ventana[2],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
            "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
     mvwprintw(ventana->ventana[2],3,1,"-------------------------------------------------------------------------------");
@@ -43,10 +42,28 @@ void imprimirTabla(void){
 }
 
 
-void imprimirFilaPr(PCB *nodo){
-    mvprintw(10,0,"%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s\n",
+void imprimirListos(PCB *nodo, int renglon){
+    werase(ventana->ventana[3]);
+    box(ventana->ventana[3], 0, 0);
+    mvwprintw(ventana->ventana[3], 1, 1, "-----  LISTOS  -----");
+    mvwprintw(ventana->ventana[3],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
+           "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
+    mvwprintw(ventana->ventana[3],3,1,"---------------------------------------");
+    mvwprintw(ventana->ventana[3], renglon+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
            nodo->id, nodo->pc, nodo->ax, nodo->bx, nodo->cx, nodo->dx, 
-           nodo->nombre, nodo->ir, "Correcto");
-           refresh();   
-           usleep(tiempo);
+           nodo->nombre, "-", "-");
+    wrefresh(ventana->ventana[3]);
+    usleep(tiempo);
+}
+
+void imprimirTerminados(PCB *nodo, int renglon){
+    box(ventana->ventana[4], 0, 0);
+    mvwprintw(ventana->ventana[4],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
+           "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
+    mvwprintw(ventana->ventana[4],3,1,"---------------------------------------");
+    mvwprintw(ventana->ventana[4], renglon+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
+           nodo->id, nodo->pc, nodo->ax, nodo->bx, nodo->cx, nodo->dx, 
+           nodo->nombre, nodo->ir, nodo->estado);
+    wrefresh(ventana->ventana[4]);
+    usleep(tiempo);
 }
