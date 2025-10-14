@@ -30,17 +30,22 @@ typedef struct pcb{
     struct pcb *siguiente; //puntero al siguiente PCB
 }PCB;
 
+typedef struct ventana{
+    WINDOW *ventana[5];
+    int update[5]; 
+}Ventana;
+
 extern int reg_ax, reg_bx, reg_cx, reg_dx;
 extern int reg_pc, reg_id;
 extern char reg_proceso[16], reg_ir[16], comando[TAMANIO_COMANDO];
 
+extern buffer *bufferC;
 extern PCB *arreglo_de_listas[3];
+extern Ventana *ventana;
 
 static const char *const REGISTROS[] = {"Ax", "Bx", "Cx", "Dx"};
 static const char *const OPERACIONES_GPO1[] = {"MOV", "ADD", "SUB", "MUL", "DIV"};
 static const char *const OPERACIONES_GPO2[] = {"INC", "DEC"};
-
-extern WINDOW *ventana;
 
 extern int tiempo;
 

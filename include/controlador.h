@@ -19,7 +19,7 @@
 #include "include/validar.h"                        //Valida las cosas :)
 #include "include/leer_archivo.h"                   //quien sabe xd
 #include "kbhit.h"                                  
-
+#include "ventana.h"
 
 #include <sys/time.h>   // Para struct timeval
 #include <sys/types.h>  // Para fd_set (en algunos sistemas)

@@ -42,8 +42,9 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
 }
 
 void leerComando(char *comando){
-    getstr(comando);
+    wgetnstr(ventana->ventana[0],comando,100);
     interprete(comando);
+    ventanaPromt(ventana);
 }
 
 void limpiarBuffer(buffer *bufferC) {

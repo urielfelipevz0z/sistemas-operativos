@@ -3,6 +3,7 @@
         "ncurses.h": "c",
         "leer_archivo.h": "c",
         "instrucciones.h": "c",
-        "validar.h": "c"
+        "validar.h": "c",
+        "controlador.h": "c"
     }
 }

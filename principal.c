@@ -11,20 +11,20 @@
 #include "include/controlador.h"
 
 int main(){
-    ventana = initscr();        //inicializa la ventana
-    if(ventana == NULL){
-        return 1;
-    }
+    
+    initscr();//inicializa pantalla de ncurses
+    curs_set(0);//oculta el cursor de la terminal
 
-    keypad(ventana, TRUE);
+    ventana = malloc(sizeof(Ventana));
+    inicializarVentanas(ventana);
+    imprimirVentanas(ventana);
+
     while (1){
-        clear();
-        mvprintw(0, 0, ">> ");      //imprime en un lugar en especifico
-        
         if (kbhito()) {
             leerComando(comando);   // solo llamas si hay entrada
         }
-        refresh();                  //actualiza la pantalla
-        usleep(tiempo * 5);                 //utilizada para hacer pausas
-    } 
+        
+    }
+    free(ventana);
+    endwin(); 
 }

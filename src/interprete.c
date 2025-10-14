@@ -7,7 +7,7 @@ void reiniciarRegistros(){
     reg_dx = 0;
     reg_pc = 1;
     strcpy(reg_ir, "");
-    strcpy(reg_proceso, "");
+    //strcpy(reg_proceso, "");
 }
 //Iguala los registros locales a los globales
 void igualarRegistros(PCB *nodo){

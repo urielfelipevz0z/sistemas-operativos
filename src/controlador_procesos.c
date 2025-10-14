@@ -8,8 +8,7 @@ void gestorProcesos(char *argumento, PCB *arreglo_de_listas[]){
 
     strcpy(arg_copia,argumento);  //a.asm b.asm si.asm
     char *proceso = strtok(arg_copia, " "); //a.asm
-    strcpy(reg_proceso, proceso);
-
+    
     for(int i = 0; proceso != NULL; i++){
         archivos[i] = proceso;              // [a.asm, b.asm, si.asm] Guardar
         proceso = strtok(NULL, " ");
@@ -40,10 +39,11 @@ PCB *crear(char *proceso){
 
         strcpy(nuevo->ir, "");
         strcpy(nuevo->estado, "");
-        strcpy(nuevo->nombre, proceso);
-                
+        strcpy(nuevo->nombre, proceso); //a.asm
         nuevo->archivo = fopen(proceso, "r");
+
         nuevo->siguiente = NULL;
+        
     }
     return nuevo;
 }
@@ -79,7 +79,7 @@ void manejador(PCB *arreglo_de_listas[]){
             strcpy(reg_proceso, ""); 
         } 
         igualarRegistros(&aux[0]); 
-        imprimirFilaPr(&aux[0]);
+        //imprimirFilaPr(&aux[0]);
         arreglo_de_listas[1] = NULL;
         insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
         recorrerListas(&(arreglo_de_listas[0]));
