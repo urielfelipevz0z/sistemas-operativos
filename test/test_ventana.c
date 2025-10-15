@@ -11,7 +11,7 @@ int main(){
     noecho();
     curs_set(0);
     
-    Ventana *ventana = malloc(sizeof(ventana));
+    Ventana *ventana = malloc(sizeof(Ventana));
     if(!ventana){
         endwin();
         return 1;
@@ -31,7 +31,10 @@ int main(){
     
     getch();
     delwin(ventana->ventana[0]);
-    free(ventana);
+    if(ventana != NULL){
+        free(ventana);
+        ventana = NULL;
+    }
     endwin();
     return 0;
 }

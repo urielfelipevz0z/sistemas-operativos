@@ -6,6 +6,8 @@ PCB *lista_terminados = NULL;
 
 PCB *arreglo_de_listas[3];
 
+PCB *aux;
+
 void inicializar_arreglo_listas() {
     arreglo_de_listas[0] = NULL;
     arreglo_de_listas[1] = NULL;
@@ -20,5 +22,5 @@ char comando[TAMANIO_COMANDO] = "";
 buffer *bufferC = NULL;
 Ventana *ventana = NULL;
 
- int tiempo = 1000000 * SEGUNDOS;
-// //int tiempo = 500000 * SEGUNDOS;
+//  int tiempo = 1000000 * SEGUNDOS;
+int tiempo = 50000 * SEGUNDOS;

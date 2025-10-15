@@ -9,9 +9,10 @@
  */
 
 #include "include/controlador.h"
+void simon();
 
 int main(){
-    
+
     initscr();//inicializa pantalla de ncurses
     curs_set(0);//oculta el cursor de la terminal
 
@@ -23,8 +24,53 @@ int main(){
         if (kbhito()) {
             leerComando(comando);   // solo llamas si hay entrada
         }
-        
+        simon();   
     }
-    free(ventana);
+    if(ventana != NULL){
+        free(ventana);
+        ventana = NULL;
+    }
     endwin(); 
 }
+
+void simon(){
+    if(arreglo_de_listas[0] != NULL){
+        recorrerListas(&(arreglo_de_listas[0]));
+        //imprimir lista de listos
+        // while (arreglo_de_listas[0] != NULL){ 
+        
+        if(arreglo_de_listas[1] == NULL){
+            aux = arreglo_de_listas[0]; 
+            arreglo_de_listas[0] = aux->siguiente;
+            aux->siguiente = NULL;
+            insertar(&(arreglo_de_listas[1]), aux); //Se mueve el 1er nodo de listos a ejecución 
+            recorrerListas(&(arreglo_de_listas[0]));
+            strcpy(reg_proceso, aux[0].nombre); 
+            if (leerArchivo(&aux[0]) == -1){ //a.asm 
+                reg_id--; 
+                strcpy(reg_proceso, ""); 
+            } 
+        }
+        else{
+            if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
+                igualarRegistros(&aux[0]); 
+                arreglo_de_listas[1] = NULL;
+                insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
+                recorrerListas(&(arreglo_de_listas[0]));
+            }
+        }      
+    }
+    if(arreglo_de_listas[1] != NULL){
+        if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
+                igualarRegistros(&aux[0]); 
+                arreglo_de_listas[1] = NULL;
+                insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
+                recorrerListas(&(arreglo_de_listas[0]));
+        }
+    }
+}
+
+
+
+
+

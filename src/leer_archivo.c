@@ -11,11 +11,23 @@ int leerArchivo(PCB *proceso){  //a.asm
         return -1;
     }
 
+
+    if(bandera == 0){
+        sprintf(desc, "[WARNING]: Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
+        imprimirError(desc);
+    }
+    if(ejecutarInstruccion(archivo)){
+        fclose(archivo);
+    }
+    
+    return 0;
+}
+
+int ejecutarInstruccion(FILE *archivo){
     char linea[TAMANIO_LINEA];
 
     imprimirTabla();
-    
-    while (fgets(linea, sizeof(linea), archivo) != NULL){   //linea = MOV Ax,7 o INC Ax
+    if (fgets(linea, sizeof(linea), archivo) != NULL){   //linea = MOV Ax,7 o INC Ax
         bandera = 0;
         linea[strcspn(linea, "\n")] = 0;
         
@@ -26,17 +38,18 @@ int leerArchivo(PCB *proceso){  //a.asm
         char *token = strtok(copia, " ");       //token = MOV
         
         if (token == NULL){
-            continue;
+            return 0;
         }
 
+        //END
         if (strcmp("END", token) == 0){
             bandera = 1;
             sprintf(desc, "Archivo %s finalizado por instruccion END", reg_proceso);
             imprimirError(desc);
             strcpy(reg_estado, "CORRECTO");
-            fclose(archivo);
+            // fclose(archivo);
             reg_pc++;
-            return 0;
+            return 1;
         }
         
         int tipo_op = tipoOperacion(token);     //1 o 2
@@ -44,7 +57,7 @@ int leerArchivo(PCB *proceso){  //a.asm
         char *operandos = strtok(NULL, "");     //Ax,7
         if (operandos == NULL){
             imprimirFilaConError("Cantidad incorrecta de operandos");
-            continue;
+            return 0;
         }
 
         if (tipo_op == 1){
@@ -53,17 +66,12 @@ int leerArchivo(PCB *proceso){  //a.asm
             analizadorGpo2(token, operandos);
         } else{
             imprimirFilaConError("Instrucción no reconocida");
-            continue;
+            return 0;
         }
     }
-
-    if(bandera == 0){
-        sprintf(desc, "[WARNING]: Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
-        imprimirError(desc);
+    else{
+        return 1;
     }
-    
-    fclose(archivo);
-    return 0;
 }
 
 

@@ -21,7 +21,7 @@ void gestorProcesos(char *argumento, PCB *arreglo_de_listas[]){
             insertar(&(arreglo_de_listas[0]), nuevo);       //Se guardan todos los nodos en lista_listos
         }
     }
-    manejador(arreglo_de_listas);
+    //manejador(arreglo_de_listas);
 }
 
 PCB *crear(char *proceso){
@@ -65,28 +65,31 @@ void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
 }
 
 void manejador(PCB *arreglo_de_listas[]){
-    PCB *aux; 
-    recorrerListas(&(arreglo_de_listas[0]));
-    //imprimir lista de listos
-    while (arreglo_de_listas[0] != NULL){ 
-        aux = arreglo_de_listas[0]; 
-        arreglo_de_listas[0] = aux->siguiente;
-        aux->siguiente = NULL;
-        insertar(&(arreglo_de_listas[1]), aux); //Se mueve el 1er nodo de listos a ejecución 
-        //imprimir ejecucion
-        recorrerListas(&(arreglo_de_listas[0]));
-        strcpy(reg_proceso, aux[0].nombre); 
-        if (leerArchivo(&aux[0]) == -1){ //a.asm 
-            reg_id--; 
-            strcpy(reg_proceso, ""); 
-        } 
+    // PCB *aux; 
+    // recorrerListas(&(arreglo_de_listas[0]));
+    // //imprimir lista de listos
+    // while (arreglo_de_listas[0] != NULL){ 
+    //     aux = arreglo_de_listas[0]; 
+    //     arreglo_de_listas[0] = aux->siguiente;
+    //     aux->siguiente = NULL;
+    //     insertar(&(arreglo_de_listas[1]), aux); //Se mueve el 1er nodo de listos a ejecución 
+    //     //imprimir ejecucion
+    //     recorrerListas(&(arreglo_de_listas[0]));
+    //     strcpy(reg_proceso, aux[0].nombre); 
+    //     if (leerArchivo(&aux[0]) == -1){ //a.asm 
+    //         reg_id--; 
+    //         strcpy(reg_proceso, ""); 
+    //     } 
         
-        igualarRegistros(&aux[0]); 
-        arreglo_de_listas[1] = NULL;
-        insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
-        recorrerListas(&(arreglo_de_listas[0]));
-    }
+    //     igualarRegistros(&aux[0]); 
+    //     arreglo_de_listas[1] = NULL;
+    //     insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
+    //     recorrerListas(&(arreglo_de_listas[0]));
+    // }
 }
+
+
+
 
 void eliminar(PCB *arreglo_de_listas[]){
     PCB *aux;

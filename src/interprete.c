@@ -30,9 +30,16 @@ void interprete(char *comando){
     
     
     if(extraerComando(bufferC) == -1){
-        free(bufferC);
+        if(bufferC != NULL){
+            free(bufferC);
+            bufferC = NULL;
+        }
+        
         return;
     }
     
-    free(bufferC);
+    if(bufferC != NULL){
+            free(bufferC);
+            bufferC = NULL;
+        }
 }

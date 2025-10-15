@@ -8,5 +8,5 @@ void manejador(PCB *arreglo_de_listas[]);
 void eliminar(PCB *arreglo_de_listas[]);
 void recorrerListas(PCB *arreglo_de_listas[]);
 void imprimirInfo(PCB *nodo);
-void mielda();
+void simon();
 #endif
