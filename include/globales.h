@@ -38,6 +38,9 @@ typedef struct ventana{
 extern int reg_ax, reg_bx, reg_cx, reg_dx;
 extern int reg_pc, reg_id;
 extern char reg_proceso[16], reg_ir[16], reg_estado[16], comando[TAMANIO_COMANDO];
+extern int bandera;
+extern char desc[256];
+extern int id_listos;
 
 extern PCB *aux;
 

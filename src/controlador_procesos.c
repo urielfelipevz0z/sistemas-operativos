@@ -28,23 +28,28 @@ PCB *crear(char *proceso){
     PCB *nuevo = (PCB *)malloc(sizeof(PCB));
     if(nuevo == NULL){
         imprimirError("No se ha podido crear el proceso\n");
+        return NULL;
     }
-    else{
-        nuevo->id = 0;
-        nuevo->pc = 1;
-        nuevo->ax = 0;
-        nuevo->bx = 0;
-        nuevo->cx = 0;
-        nuevo->dx = 0;
-
-        strcpy(nuevo->ir, "");
-        strcpy(nuevo->estado, "");
-        strcpy(nuevo->nombre, proceso); //a.asm
-        nuevo->archivo = fopen(proceso, "r");
-
-        nuevo->siguiente = NULL;
-        
+    
+    nuevo->archivo = fopen(proceso, "r");
+    if (nuevo->archivo == NULL) {
+        free(nuevo);
+        return NULL;
     }
+    id_listos++;
+    nuevo->id = id_listos;
+    nuevo->pc = 1;
+    nuevo->ax = 0;
+    nuevo->bx = 0;
+    nuevo->cx = 0;
+    nuevo->dx = 0;
+    
+    strcpy(nuevo->ir, "");
+    strcpy(nuevo->estado, "");
+    strcpy(nuevo->nombre, proceso); //a.asm
+    
+    nuevo->archivo = fopen(proceso, "r");
+    nuevo->siguiente = NULL;
     return nuevo;
 }
 
@@ -64,32 +69,52 @@ void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
     }
 }
 
-void manejador(PCB *arreglo_de_listas[]){
-    // PCB *aux; 
-    // recorrerListas(&(arreglo_de_listas[0]));
-    // //imprimir lista de listos
-    // while (arreglo_de_listas[0] != NULL){ 
-    //     aux = arreglo_de_listas[0]; 
-    //     arreglo_de_listas[0] = aux->siguiente;
-    //     aux->siguiente = NULL;
-    //     insertar(&(arreglo_de_listas[1]), aux); //Se mueve el 1er nodo de listos a ejecución 
-    //     //imprimir ejecucion
-    //     recorrerListas(&(arreglo_de_listas[0]));
-    //     strcpy(reg_proceso, aux[0].nombre); 
-    //     if (leerArchivo(&aux[0]) == -1){ //a.asm 
-    //         reg_id--; 
-    //         strcpy(reg_proceso, ""); 
-    //     } 
+void manejador(){
+        if(arreglo_de_listas[0] != NULL){
+        recorrerListas(&(arreglo_de_listas[0]));
+        //imprimir lista de listos
+        // while (arreglo_de_listas[0] != NULL){ 
         
-    //     igualarRegistros(&aux[0]); 
-    //     arreglo_de_listas[1] = NULL;
-    //     insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
-    //     recorrerListas(&(arreglo_de_listas[0]));
-    // }
+        if(arreglo_de_listas[1] == NULL){
+            aux = arreglo_de_listas[0]; 
+            arreglo_de_listas[0] = aux->siguiente;
+            aux->siguiente = NULL;
+            insertar(&(arreglo_de_listas[1]), aux); //Se mueve el 1er nodo de listos a ejecución 
+            recorrerListas(&(arreglo_de_listas[0]));
+            strcpy(reg_proceso, aux[0].nombre); 
+            if (leerArchivo(&aux[0]) == -1){ //a.asm 
+                reg_id--;
+                strcpy(reg_proceso, ""); 
+                bandera = 0; //reinicio de la bandera
+            } 
+        }
+        else{
+            if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
+                if(bandera == 0){
+                    sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
+                    imprimirError(desc);
+                }
+                igualarRegistros(&aux[0]);
+                arreglo_de_listas[1] = NULL;
+                insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
+                recorrerListas(&(arreglo_de_listas[0]));
+            }
+        }      
+    }
+    if(arreglo_de_listas[1] != NULL){
+        if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
+                igualarRegistros(&aux[0]); 
+                arreglo_de_listas[1] = NULL;
+                insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
+                recorrerListas(&(arreglo_de_listas[0]));
+            if(bandera == 0){
+                sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
+                imprimirError(desc);
+            }
+        imprimirEncabezadoEjecucion();            
+        }
+    }
 }
-
-
-
 
 void eliminar(PCB *arreglo_de_listas[]){
     PCB *aux;
@@ -152,17 +177,4 @@ void recorrerListas(PCB *arreglo_de_listas[]){
             wrefresh(ventana->ventana[4]);
         }
     }
-}
-
-void imprimirInfo(PCB *nodo){
-    mvprintw(20,0,"id = %d", nodo[0].id);
-    mvprintw(21,0,"pc = %d", nodo[0].pc);
-    mvprintw(22,0,"ax = %d", nodo[0].ax);
-    mvprintw(23,0,"bx = %d", nodo[0].bx);
-    mvprintw(24,0,"cx = %d", nodo[0].cx);
-    mvprintw(25,0,"dx = %d", nodo[0].dx);
-    mvprintw(26,0,"ir = %s", nodo[0].ir);
-    mvprintw(27,0,"estado = %s", nodo[0].estado);
-    mvprintw(28,0,"nombre = %s", nodo[0].nombre);
-    refresh();
 }

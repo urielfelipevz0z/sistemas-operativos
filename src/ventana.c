@@ -2,11 +2,11 @@
 
 void inicializarVentanas(Ventana *ventana){
 
-    ventana->ventana[0] = newwin(3,100,0,0);    //Promt
-    ventana->ventana[1] = newwin(3,100,3,0);    //Mensajes de error
-    ventana->ventana[2] = newwin(7,100,6,0);    //Lista de Ejecucion
-    ventana->ventana[3] = newwin(12,100,13,0);   //Lista de Listos
-    ventana->ventana[4] = newwin(12,100,25,0);   //Lista de Terminados
+    ventana->ventana[0] = newwin(3,105,0,0);    //Promt
+    ventana->ventana[1] = newwin(3,105,3,0);    //Mensajes de error
+    ventana->ventana[2] = newwin(7,105,6,0);    //Lista de Ejecucion
+    ventana->ventana[3] = newwin(12,105,13,0);   //Lista de Listos
+    ventana->ventana[4] = newwin(12,105,25,0);   //Lista de Terminados
     ventana->update[0] = 1;
     ventana->update[1] = 1;
     ventana->update[2] = 1;

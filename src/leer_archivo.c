@@ -1,6 +1,5 @@
 #include "include/controlador.h"
-int bandera = 0;
-char desc[256];
+
 
 int leerArchivo(PCB *proceso){  //a.asm
     reiniciarRegistros();
@@ -9,12 +8,6 @@ int leerArchivo(PCB *proceso){  //a.asm
     if (archivo == NULL){
         imprimirError("Archivo no encontrado");
         return -1;
-    }
-
-
-    if(bandera == 0){
-        sprintf(desc, "[WARNING]: Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
-        imprimirError(desc);
     }
     if(ejecutarInstruccion(archivo)){
         fclose(archivo);
@@ -73,7 +66,3 @@ int ejecutarInstruccion(FILE *archivo){
         return 1;
     }
 }
-
-
-
-
