@@ -178,3 +178,87 @@ void recorrerListas(PCB *arreglo_de_listas[]){
         }
     }
 }
+
+int leerArchivo(PCB *proceso){  //a.asm
+    reiniciarRegistros();
+    reg_id++;
+    FILE *archivo = proceso->archivo;
+    if (archivo == NULL){
+        imprimirError("Archivo no encontrado");
+        return -1;
+    }
+    if(ejecutarInstruccion(archivo)){
+        fclose(archivo);
+    }
+    
+    return 0;
+}
+
+int ejecutarInstruccion(FILE *archivo){
+    char linea[TAMANIO_LINEA];
+
+    imprimirTabla();
+    if (fgets(linea, sizeof(linea), archivo) != NULL){   //linea = MOV Ax,7 o INC Ax
+        bandera = 0;
+        linea[strcspn(linea, "\n")] = 0;
+        
+        strcpy(reg_ir, linea);
+        
+        char copia[TAMANIO_LINEA];
+        strcpy(copia, linea);
+        char *token = strtok(copia, " ");       //token = MOV
+        
+        if (token == NULL){
+            return 0;
+        }
+
+        //END
+        if (strcmp("END", token) == 0){
+            bandera = 1;
+            imprimirError(desc);
+            strcpy(reg_estado, "CORRECTO");
+            // fclose(archivo);
+            reg_pc++;
+            return 1;
+        }
+        
+        int tipo_op = tipoOperacion(token);     //1 o 2
+        
+        char *operandos = strtok(NULL, "");     //Ax,7
+        if (operandos == NULL){
+            imprimirFilaConError("Cantidad incorrecta de operandos");
+            return 0;
+        }
+
+        if (tipo_op == 1){
+            if(analizadorGpo1(token, operandos)){ //MOV y Ax,7
+                bandera = 1;
+                strcpy(reg_estado, "ERROR DE SINTAXIS");
+                reg_pc++;
+                return 1;
+            }  
+        } else if (tipo_op == 2){
+            if(analizadorGpo2(token, operandos)){ 
+                bandera = 1;
+                strcpy(reg_estado, "ERROR DE SINTAXIS");
+                reg_pc++;
+                return 1;
+            }  
+        } else{
+            imprimirFilaConError("Instrucción no reconocida");
+            return 0;
+        }
+    }
+    else{
+        return 1;
+    }
+}
+
+
+
+
+
+
+
+
+

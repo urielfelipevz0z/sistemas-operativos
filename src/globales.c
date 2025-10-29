@@ -16,7 +16,7 @@ void inicializar_arreglo_listas() {
 
 int reg_ax, reg_bx, reg_cx, reg_dx = 0;
 int reg_pc, reg_id = 0;
-char reg_proceso[16] = "", reg_ir[16] = "", reg_estado[16] = "";
+char reg_proceso[16] = "", reg_ir[16] = "", reg_estado[REG_ESTADO_TAM] = "";
 int bandera = 0;
 char desc[256] = "";
 int id_listos = 0;

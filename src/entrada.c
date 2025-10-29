@@ -28,13 +28,6 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
         
         gestorProcesos(bufferC->argumento, &(arreglo_de_listas[0]));
 
-        // if(comprobarAsm(bufferC->argumento, token)){
-        //     return -1;
-        // }
-
-        // strcpy(reg_ir, "");
-        // strcpy(reg_proceso, bufferC->argumento); //a.asm
-
     } else{
         imprimirError("Comando no reconocido");
         return -1;
@@ -52,3 +45,72 @@ void limpiarBuffer(buffer *bufferC) {
         memset(bufferC, 0, sizeof(buffer));
     }
 }
+
+void reiniciarRegistros(){
+    reg_ax = 0;
+    reg_bx = 0;
+    reg_cx = 0;
+    reg_dx = 0;
+    reg_pc = 1;
+    strcpy(reg_ir, "");
+    strcpy(reg_estado, "ERROR");
+    //strcpy(reg_proceso, "");
+}
+
+void igualarRegistros(PCB *nodo){
+    nodo->ax = reg_ax;
+    nodo->bx = reg_bx;
+    nodo->cx = reg_cx;
+    nodo->dx = reg_dx;
+    nodo->pc = reg_pc;
+    nodo->id = reg_id;
+    strcpy(nodo->ir, reg_ir);
+    strcpy(nodo->estado, reg_estado);
+}
+
+void interprete(char *comando){    
+    buffer *bufferC = NULL;
+    bufferC = (buffer *)malloc(sizeof(buffer));
+    limpiarBuffer(bufferC);
+    strcpy(bufferC->comandoCompleto, comando);
+    
+    
+    if(extraerComando(bufferC) == -1){
+        if(bufferC != NULL){
+            free(bufferC);
+            bufferC = NULL;
+        }
+        
+        return;
+    }
+    
+    if(bufferC != NULL){
+            free(bufferC);
+            bufferC = NULL;
+        }
+}
+
+int kbhito(void){
+    struct timeval tv;
+    fd_set read_fd;
+    tv.tv_sec = 0;
+    tv.tv_usec = 0;
+    FD_ZERO(&read_fd);
+    FD_SET(0,&read_fd);
+    if(select(1, &read_fd, NULL, NULL, &tv) == -1){
+        return 0;    
+    }
+
+    if(FD_ISSET(0, &read_fd)){
+        return 1;
+    }
+    return 0;
+}
+
+
+
+
+
+
+
+

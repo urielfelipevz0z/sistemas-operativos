@@ -1,0 +1,6 @@
+Se re-estructuro el código como se menciono en el documento compartido en el grupo.
+
+1.- Si existe un error terminar la ejecución.
+    Modificaciones en AnalizadorGpo1() y AnalizadorGpo2() se les cambio de tipo void a int en cada error retorna 1, se usa en sentencia if del archivo proceso.c funcion: ejecutarInstruccion() funcionan similar a lo que es la instruccion END. Se extendio el tamaño del arreglo estado_registro de 16 a 32
+
+2.-  

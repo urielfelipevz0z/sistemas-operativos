@@ -4,6 +4,13 @@
         "leer_archivo.h": "c",
         "instrucciones.h": "c",
         "validar.h": "c",
-        "controlador.h": "c"
+        "controlador.h": "c",
+        "globales.h": "c",
+        "interprete.h": "c",
+        "imprimir.h": "c",
+        "proceso.h": "c",
+        "cpu.h": "c",
+        "interfaz.h": "c",
+        "entrada.h": "c"
     }
 }

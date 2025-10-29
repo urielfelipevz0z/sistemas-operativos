@@ -1,0 +1,5 @@
+MOV Ax,1
+MOV Bx,2
+MOV Cx,3
+MOV Dx,Ax
+END

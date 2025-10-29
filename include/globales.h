@@ -3,6 +3,7 @@
 
 #define TAMANIO_COMANDO 500
 #define TAMANIO_LINEA 128
+#define REG_ESTADO_TAM 32
 
 #define NUM_REGISTROS 4
 #define NUM_OPS_GPO1 5
@@ -24,7 +25,7 @@ typedef struct pcb{
     int cx;
     int dx;
     char ir[16];
-    char estado[10];    // Nuevo, Listo, Terminado(Bien o Mal), Bloqueado, Suspendido
+    char estado[REG_ESTADO_TAM];    // Nuevo, Listo, Terminado(Bien o Mal), Bloqueado, Suspendido
     char nombre[30]; //nombre del archivo
     FILE *archivo; //puntero al archivo
     struct pcb *siguiente; //puntero al siguiente PCB
@@ -37,7 +38,7 @@ typedef struct ventana{
 
 extern int reg_ax, reg_bx, reg_cx, reg_dx;
 extern int reg_pc, reg_id;
-extern char reg_proceso[16], reg_ir[16], reg_estado[16], comando[TAMANIO_COMANDO];
+extern char reg_proceso[16], reg_ir[16], reg_estado[REG_ESTADO_TAM], comando[TAMANIO_COMANDO];
 extern int bandera;
 extern char desc[256];
 extern int id_listos;
