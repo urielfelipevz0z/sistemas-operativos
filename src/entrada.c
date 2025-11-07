@@ -57,7 +57,7 @@ void reiniciarRegistros(){
     //strcpy(reg_proceso, "");
 }
 
-void igualarRegistros(PCB *nodo){
+void guardarContexto(PCB *nodo){
     nodo->ax = reg_ax;
     nodo->bx = reg_bx;
     nodo->cx = reg_cx;
@@ -67,6 +67,18 @@ void igualarRegistros(PCB *nodo){
     strcpy(nodo->ir, reg_ir);
     strcpy(nodo->estado, reg_estado);
 }
+
+void cargarContexto(PCB *nodo){
+    Q = 0;
+    reg_ax = nodo->ax;
+    reg_bx = nodo->bx;
+    reg_cx = nodo->cx;
+    reg_dx = nodo->dx;
+    reg_pc = nodo->pc;
+    reg_id = nodo->id;
+    strcpy(nodo->estado, "");
+}
+
 
 void interprete(char *comando){    
     buffer *bufferC = NULL;

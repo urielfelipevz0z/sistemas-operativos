@@ -31,11 +31,13 @@ PCB *crear(char *proceso){
         return NULL;
     }
     
-    nuevo->archivo = fopen(proceso, "r");
-    if (nuevo->archivo == NULL) {
+    FILE *f = fopen(proceso, "r");
+    if (f == NULL) {
         free(nuevo);
         return NULL;
     }
+    nuevo->archivo = f;
+
     id_listos++;
     nuevo->id = id_listos;
     nuevo->pc = 1;
@@ -48,7 +50,7 @@ PCB *crear(char *proceso){
     strcpy(nuevo->estado, "");
     strcpy(nuevo->nombre, proceso); //a.asm
     
-    nuevo->archivo = fopen(proceso, "r");
+    //nuevo->archivo = fopen(proceso, "r"); se abria el doc dos veces xd
     nuevo->siguiente = NULL;
     return nuevo;
 }
@@ -69,51 +71,89 @@ void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
     }
 }
 
-void manejador(){
-        if(arreglo_de_listas[0] != NULL){
-        recorrerListas(&(arreglo_de_listas[0]));
-        //imprimir lista de listos
-        // while (arreglo_de_listas[0] != NULL){ 
-        
-        if(arreglo_de_listas[1] == NULL){
-            aux = arreglo_de_listas[0]; 
+int manejador(){
+    if(arreglo_de_listas[0] != NULL){       //Hay algo en listos?
+    recorrerListas(&(arreglo_de_listas[0]));
+
+        if(arreglo_de_listas[1] == NULL){       //Si no hay nada en ejecución
+            aux = arreglo_de_listas[0];         //cargar el 1er nodo de listos 
             arreglo_de_listas[0] = aux->siguiente;
             aux->siguiente = NULL;
             insertar(&(arreglo_de_listas[1]), aux); //Se mueve el 1er nodo de listos a ejecución 
+            cargarContexto(aux);                    //Para todos los casos se carga contexto
             recorrerListas(&(arreglo_de_listas[0]));
             strcpy(reg_proceso, aux[0].nombre); 
-            if (leerArchivo(&aux[0]) == -1){ //a.asm 
-                reg_id--;
-                strcpy(reg_proceso, ""); 
-                bandera = 0; //reinicio de la bandera
-            } 
-        }
-        else{
-            if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
+
+            int res = leerArchivo(aux);
+            if(res == -1){      //si no existe el archivo a.asm se acaba la funcion pq son puros if anidados
+                strcpy(reg_proceso, "");
+                bandera = 0;
+            }
+            else if(res == 1){      //existe el archivo a.asm pero termino al cargarse en ejecucion (evita el problea de archivos con 4*n+1 lineas)
+                aux = arreglo_de_listas[1];
+                arreglo_de_listas[1] = NULL;
+                guardarContexto(aux);   //se extrae el nodo y se guarda el valor de los registros
+                if (aux->archivo != NULL){  //se cierra
+                    fclose(aux->archivo);
+                    aux->archivo = NULL;
+                }
+                aux->siguiente = NULL;  
+                insertar(&(arreglo_de_listas[2]), aux); //Se manda a terminados
+                recorrerListas(&(arreglo_de_listas[0]));
                 if(bandera == 0){
                     sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
                     imprimirError(desc);
+                    strcpy(reg_estado, "ERROR");
                 }
-                igualarRegistros(&aux[0]);
+                imprimirEncabezadoEjecucion();
+                return 1;
+            }
+
+        }
+        else{       //Hay algo en ejecucion
+            if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
+                aux = arreglo_de_listas[1];
                 arreglo_de_listas[1] = NULL;
+                guardarContexto(&aux[0]);
+                if (aux->archivo != NULL){
+                    fclose(aux->archivo);
+                    aux->archivo = NULL;
+                }
+                aux->siguiente = NULL;
                 insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
                 recorrerListas(&(arreglo_de_listas[0]));
+                if(bandera == 0){
+                    sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
+                    imprimirError(desc);
+                    strcpy(reg_estado, "ERROR");
+                }
+                imprimirEncabezadoEjecucion();
+                return 1;   //Si se termina el proceso termina el ciclo FOR Q
             }
         }      
     }
-    if(arreglo_de_listas[1] != NULL){
+    else if(arreglo_de_listas[1] != NULL){       //Entra cuando no hay nada en listos pero si en ejecución
         if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
-                igualarRegistros(&aux[0]); 
-                arreglo_de_listas[1] = NULL;
-                insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
-                recorrerListas(&(arreglo_de_listas[0]));
+            aux = arreglo_de_listas[1];
+            arreglo_de_listas[1] = NULL;
+            guardarContexto(&aux[0]); 
+            if (aux->archivo != NULL){
+            fclose(aux->archivo);
+            aux->archivo = NULL;
+            }
+            aux->siguiente = NULL;
+            insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
+            recorrerListas(&(arreglo_de_listas[0]));
             if(bandera == 0){
                 sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
                 imprimirError(desc);
+                strcpy(reg_estado, "ERROR");
             }
-        imprimirEncabezadoEjecucion();            
+            imprimirEncabezadoEjecucion();            
+            return 1;       //Si se termina el proceso termina el ciclo FOR Q
         }
     }
+    return 0;
 }
 
 void eliminar(PCB *arreglo_de_listas[]){
@@ -154,7 +194,7 @@ void recorrerListas(PCB *arreglo_de_listas[]){
                 lista = lista->siguiente;
                 mvwprintw(ventana->ventana[3], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
                     aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx,
-                    aux->nombre, "-", "-");
+                    aux->nombre, aux->ir, aux->estado);
                 j++;
             }
             wrefresh(ventana->ventana[3]);
@@ -180,22 +220,26 @@ void recorrerListas(PCB *arreglo_de_listas[]){
 }
 
 int leerArchivo(PCB *proceso){  //a.asm
-    reiniciarRegistros();
-    reg_id++;
-    FILE *archivo = proceso->archivo;
-    if (archivo == NULL){
+    //reiniciarRegistros();
+    // reg_id++;
+    if (proceso == NULL || proceso->archivo == NULL){
         imprimirError("Archivo no encontrado");
         return -1;
     }
-    if(ejecutarInstruccion(archivo)){
-        fclose(archivo);
+    FILE *f = proceso->archivo;
+    if(ejecutarInstruccion(f)){
+        // fclose(f);
+        // proceso->archivo = NULL;
+        return 1;
     }
-    
     return 0;
 }
 
 int ejecutarInstruccion(FILE *archivo){
     char linea[TAMANIO_LINEA];
+    if(archivo == NULL){
+        return 1;
+    }
 
     imprimirTabla();
     if (fgets(linea, sizeof(linea), archivo) != NULL){   //linea = MOV Ax,7 o INC Ax
@@ -248,13 +292,38 @@ int ejecutarInstruccion(FILE *archivo){
             imprimirFilaConError("Instrucción no reconocida");
             return 0;
         }
+        return 0;
     }
     else{
         return 1;
     }
 }
 
+int quantum(){
+    PCB *aux;
 
+    for(Q = 0; Q < 4 ;Q++){
+        if (kbhito()) {
+           leerComando(comando);   // solo llamas si hay entrada
+        }
+        sprintf(desc, "[QUANTUM] %d/4 del proceso: %s", Q+1, reg_proceso);
+        imprimirError(desc);
+        if(manejador() == 1){
+            break;
+        }
+    }
+    if(arreglo_de_listas[1] != NULL){ //Se termino el Q, pero aun no se termina el archivo se guarda como pendiente
+        aux = arreglo_de_listas[1];
+        strcpy(reg_estado, "PENDIENTE");
+        guardarContexto(aux);    
+        aux->siguiente = NULL; 
+        insertar(&(arreglo_de_listas[0]), aux); //Se regresa el nodo actual a la lista de listos.
+        recorrerListas(&(arreglo_de_listas[0]));
+        arreglo_de_listas[1] = NULL;
+    }
+
+    return 0;
+}
 
 
 

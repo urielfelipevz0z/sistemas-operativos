@@ -1,0 +1,17 @@
+ADD Ax,1
+MOV Bx,1
+ADD Cx,1
+SUB Dx,4
+ADD Ax,1
+MOV Bx,1
+ADD Cx,1
+SUB Dx,4
+ADD Ax,1
+MOV Bx,1
+ADD Cx,1
+SUB Dx,4
+ADD Ax,1
+MOV Bx,1
+ADD Cx,1
+SUB Dx,4
+END

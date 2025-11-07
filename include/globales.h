@@ -36,7 +36,7 @@ typedef struct ventana{
     int update[5]; 
 }Ventana;
 
-extern int reg_ax, reg_bx, reg_cx, reg_dx;
+extern int reg_ax, reg_bx, reg_cx, reg_dx, Q;
 extern int reg_pc, reg_id;
 extern char reg_proceso[16], reg_ir[16], reg_estado[REG_ESTADO_TAM], comando[TAMANIO_COMANDO];
 extern int bandera;

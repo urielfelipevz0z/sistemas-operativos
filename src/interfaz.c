@@ -51,7 +51,7 @@ void imprimirListos(PCB *nodo, int renglon){
     mvwprintw(ventana->ventana[3],3,1,"---------------------------------------");
     mvwprintw(ventana->ventana[3], renglon+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
            nodo->id, nodo->pc, nodo->ax, nodo->bx, nodo->cx, nodo->dx, 
-           nodo->nombre, "-", "-");
+           nodo->nombre, nodo->ir, nodo->estado);
     wrefresh(ventana->ventana[3]);
     usleep(tiempo);
 }

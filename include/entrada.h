@@ -8,7 +8,8 @@ void leerComando(char *comando);
 void limpiarBuffer(buffer *bufferC);
 
 void reiniciarRegistros();
-void igualarRegistros(PCB *nodo);
+void guardarContexto(PCB *nodo);
+void cargarContexto(PCB *nodo);
 void interprete(char *comando);
 
 int kbhito(void);

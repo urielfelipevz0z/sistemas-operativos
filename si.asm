@@ -1,5 +1,5 @@
 ADD Ax,1
 ADD Bx,1
 ADD Cx,1
-ADD Dx,1
+ADD Dx,8
 END
