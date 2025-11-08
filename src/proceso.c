@@ -304,7 +304,7 @@ int quantum(){
 
     for(Q = 0; Q < 4 ;Q++){
         if (kbhito()) {
-           leerComando(comando);   // solo llamas si hay entrada
+           leerComando(comando);   ////solo llamas si hay entrada
         }
         sprintf(desc, "[QUANTUM] %d/4 del proceso: %s", Q+1, reg_proceso);
         imprimirError(desc);
