@@ -18,7 +18,7 @@ void gestorProcesos(char *argumento, PCB *arreglo_de_listas[]){
     for(int i = 0; i < banderaGuardados; i++){
         if(comprobarAsm(archivos[i]) == 0){
             nuevo = crear(archivos[i]);
-            insertar(&(arreglo_de_listas[0]), nuevo);       //Se guardan todos los nodos en lista_listos
+            insertar(&(arreglo_de_listas[3]), nuevo);       //Se guardan todos los nodos en lista de nuevos
         }
     }
     //manejador(arreglo_de_listas);
@@ -99,6 +99,7 @@ int manejador(){
                 }
                 aux->siguiente = NULL;  
                 insertar(&(arreglo_de_listas[2]), aux); //Se manda a terminados
+                cant_procesos--;
                 recorrerListas(&(arreglo_de_listas[0]));
                 if(bandera == 0){
                     sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
@@ -121,6 +122,7 @@ int manejador(){
                 }
                 aux->siguiente = NULL;
                 insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
+                cant_procesos--;
                 recorrerListas(&(arreglo_de_listas[0]));
                 if(bandera == 0){
                     sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
@@ -143,6 +145,7 @@ int manejador(){
             }
             aux->siguiente = NULL;
             insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
+            cant_procesos--;
             recorrerListas(&(arreglo_de_listas[0]));
             if(bandera == 0){
                 sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
@@ -301,13 +304,16 @@ int ejecutarInstruccion(FILE *archivo){
 
 int quantum(){
     PCB *aux;
-
+    if(planificadorLP()){
+        return 0;
+    }
     for(Q = 0; Q < 4 ;Q++){
         if (kbhito()) {
            leerComando(comando);   ////solo llamas si hay entrada
         }
         sprintf(desc, "[QUANTUM] %d/4 del proceso: %s", Q+1, reg_proceso);
         imprimirError(desc);
+
         if(manejador() == 1){
             break;
         }
@@ -325,7 +331,22 @@ int quantum(){
     return 0;
 }
 
-
+int planificadorLP(){
+    PCB *aux;
+    int mov = 0;
+    while(arreglo_de_listas[3] != NULL && cant_procesos < 3){   //Si hay algo en Nuevos y espacio en listos Guardar en Listos
+        aux = arreglo_de_listas[3];         
+        arreglo_de_listas[3] = aux->siguiente;
+        aux->siguiente = NULL;
+        insertar(&(arreglo_de_listas[0]), aux); //Se mueve el 1er nodo de nuevos a ejecucion
+        cant_procesos++;
+        mov = 1;
+    }
+    if(mov){
+        recorrerListas(&(arreglo_de_listas[0]));
+    }
+    return mov;
+}
 
 
 

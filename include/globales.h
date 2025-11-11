@@ -39,14 +39,14 @@ typedef struct ventana{
 extern int reg_ax, reg_bx, reg_cx, reg_dx, Q;
 extern int reg_pc, reg_id;
 extern char reg_proceso[16], reg_ir[16], reg_estado[REG_ESTADO_TAM], comando[TAMANIO_COMANDO];
-extern int bandera;
+extern int bandera, cant_procesos;
 extern char desc[256];
 extern int id_listos;
 
 extern PCB *aux;
 
 extern buffer *bufferC;
-extern PCB *arreglo_de_listas[3];
+extern PCB *arreglo_de_listas[4];
 extern Ventana *ventana;
 
 static const char *const REGISTROS[] = {"Ax", "Bx", "Cx", "Dx"};

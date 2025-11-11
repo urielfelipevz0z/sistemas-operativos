@@ -79,7 +79,6 @@ void cargarContexto(PCB *nodo){
     strcpy(nodo->estado, "");
 }
 
-
 void interprete(char *comando){    
     buffer *bufferC = NULL;
     bufferC = (buffer *)malloc(sizeof(buffer));

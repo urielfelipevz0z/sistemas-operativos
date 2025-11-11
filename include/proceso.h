@@ -14,5 +14,6 @@ int leerArchivo(PCB *proceso);
 int ejecutarInstruccion(FILE *archivo);
 
 int quantum();
+int planificadorLP();
 
 #endif
