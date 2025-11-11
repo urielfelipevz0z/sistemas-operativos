@@ -8,6 +8,7 @@
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <time.h>
 
 #include "include/cpu.h"
 // #include "include/proceso.h"

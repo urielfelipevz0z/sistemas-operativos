@@ -50,6 +50,9 @@ PCB *crear(char *proceso){
     strcpy(nuevo->estado, "");
     strcpy(nuevo->nombre, proceso); //a.asm
     
+    // Generar prioridad aleatoria entre 1 y 4
+    nuevo->prioridad = (rand() % 4) + 1;
+    
     //nuevo->archivo = fopen(proceso, "r"); se abria el doc dos veces xd
     nuevo->siguiente = NULL;
     return nuevo;
@@ -58,16 +61,31 @@ PCB *crear(char *proceso){
 void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
     
     PCB *aux;
+    PCB *anterior;
     
     if(arreglo_de_listas[0] == NULL){
        arreglo_de_listas[0] = nuevo;
     }
     else{
         aux = arreglo_de_listas[0];
-        while(aux->siguiente != NULL){ //Recorre la lista hasta el final 
+        anterior = NULL;
+        
+        // Buscar la posición correcta según prioridad
+        while(aux != NULL && aux->prioridad <= nuevo->prioridad){
+            anterior = aux;
             aux = aux->siguiente;
         }
-        aux->siguiente = nuevo;
+        
+        // Insertar al inicio (mayor prioridad que el primero)
+        if(anterior == NULL){
+            nuevo->siguiente = arreglo_de_listas[0];
+            arreglo_de_listas[0] = nuevo;
+        }
+        // Insertar en medio o al final
+        else{
+            anterior->siguiente = nuevo;
+            nuevo->siguiente = aux;
+        }
     }
 }
 
@@ -189,14 +207,14 @@ void recorrerListas(PCB *arreglo_de_listas[]){
             werase(ventana->ventana[3]);
             box(ventana->ventana[3], 0, 0);
             mvwprintw(ventana->ventana[3], 1, 1, "-----  LISTOS  -----");
-            mvwprintw(ventana->ventana[3],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
-                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[3],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
             mvwprintw(ventana->ventana[3],3,1,"---------------------------------------");
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[3], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
-                    aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx,
+                mvwprintw(ventana->ventana[3], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
+                    aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx, aux->prioridad,
                     aux->nombre, aux->ir, aux->estado);
                 j++;
             }
@@ -205,15 +223,15 @@ void recorrerListas(PCB *arreglo_de_listas[]){
         else if(i == 2){    //Lista de terminados
             lista = arreglo_de_listas[i];
             box(ventana->ventana[4], 0, 0);
-            mvwprintw(ventana->ventana[4],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
-                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[4],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
             mvwprintw(ventana->ventana[4],3,1,"---------------------------------------");
             j = 0;
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[4], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
-                    aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx,
+                mvwprintw(ventana->ventana[4], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
+                    aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx, aux->prioridad,
                     aux->nombre, aux->ir, aux->estado);
                 j++;
             }

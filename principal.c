@@ -21,6 +21,8 @@
 
 int main(){
 
+    srand((unsigned int)time(NULL)); // Inicializar generador de números aleatorios
+    
     initscr();//inicializa pantalla de ncurses
     curs_set(0);//oculta el cursor de la terminal
 

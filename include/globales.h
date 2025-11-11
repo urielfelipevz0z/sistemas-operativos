@@ -28,6 +28,7 @@ typedef struct pcb{
     char estado[REG_ESTADO_TAM];    // Nuevo, Listo, Terminado(Bien o Mal), Bloqueado, Suspendido
     char nombre[30]; //nombre del archivo
     FILE *archivo; //puntero al archivo
+    int prioridad; //prioridad del proceso (1-4)
     struct pcb *siguiente; //puntero al siguiente PCB
 }PCB;
 
