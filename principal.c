@@ -3,9 +3,7 @@
  * @brief Programa principal del simulador de sistema operativo
  * @author Equipo: Los sistématicos
  * @date 2025
- * gcc -I. principal.c src/alu.c src/imprimir.c src/interprete.c src/comando.c src/globales.c src/controlador_procesos.c src/instrucciones.c src/leer_archivo.c src/validar.c src/kbhit.c -lncurses -o sistematicos
- * ./sistematicos
- * gcc -I. principal.c src/*.c -lncurses -o sistematicos
+ *  gcc -I. principal.c src/*.c -lncurses -o sistematicos
  *  ejecuta a.asm b.asm a.asm b.asm si.asm b.asm a.asm b.asm a.asm si.asm a.asm b.asm a.asm b.asm si.asm
  *  ejecuta a.asm c.asm b.asm si.asm a.asm si.asm b.asm b.asm a.asm si.asm 
  *  ejecuta a.asm c.asm b.asm no.asm a.asm no.asm b.asm b.asm a.asm no.asm 

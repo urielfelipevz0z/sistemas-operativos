@@ -3,9 +3,7 @@
 PCB *lista_listos = NULL;
 PCB *lista_ejecucion = NULL;
 PCB *lista_terminados = NULL;
-
 PCB *arreglo_de_listas[4];
-
 PCB *aux;
 
 void inicializar_arreglo_listas() {

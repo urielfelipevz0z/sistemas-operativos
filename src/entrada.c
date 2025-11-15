@@ -28,6 +28,16 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
         
         gestorProcesos(bufferC->argumento, &(arreglo_de_listas[0]));
 
+    }
+    else if(strcmp("kill", bufferC->comando) == 0){
+
+        if(token == NULL){
+            imprimirError("Falta especificar ID de proceso");
+            return -1;
+        }
+        int id = atoi(token);
+        killProceso(arreglo_de_listas, id);
+        return 0;
     } else{
         imprimirError("Comando no reconocido");
         return -1;
@@ -91,7 +101,6 @@ void interprete(char *comando){
             free(bufferC);
             bufferC = NULL;
         }
-        
         return;
     }
     
@@ -118,10 +127,31 @@ int kbhito(void){
     return 0;
 }
 
+void killProceso(PCB *arreglo_de_listas[], int valor) {
+    PCB *anterior;
+    PCB *actual;
 
+    // Buscar en la lista de listos (0) y en ejecución (1)
+    for (int i = 0; i < 4; i++) {
+        actual = arreglo_de_listas[i];
+        anterior = NULL;
 
-
-
-
-
-
+        while (actual != NULL) {
+            if (actual->id == valor) {
+                if (anterior == NULL) {
+                    arreglo_de_listas[i] = actual->siguiente;
+                }else {
+                    anterior->siguiente = actual->siguiente;
+                }
+                actual->siguiente = NULL;
+                strcpy(actual->estado, "Terminado por KILL");
+                insertar(&(arreglo_de_listas[2]), actual);
+                cant_procesos --;
+                return;
+            }
+            anterior = actual;
+            actual = actual->siguiente;
+        }
+    }
+    imprimirError("No se encontró el proceso para KILL");
+}

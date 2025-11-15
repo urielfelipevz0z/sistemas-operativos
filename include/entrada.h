@@ -11,8 +11,7 @@ void reiniciarRegistros();
 void guardarContexto(PCB *nodo);
 void cargarContexto(PCB *nodo);
 void interprete(char *comando);
-
 int kbhito(void);
-
+void killProceso(PCB *arreglo_de_listas[], int valor);
 
 #endif

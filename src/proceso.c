@@ -87,6 +87,7 @@ void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
             nuevo->siguiente = aux;
         }
     }
+    
 }
 
 int manejador(){
@@ -199,7 +200,7 @@ void recorrerListas(PCB *arreglo_de_listas[]){
     PCB *lista;
     int j;
 
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < 4; i++){
         j = 0;
         if(i == 0){ //lista de listos
             lista = arreglo_de_listas[i];
@@ -207,13 +208,13 @@ void recorrerListas(PCB *arreglo_de_listas[]){
             werase(ventana->ventana[3]);
             box(ventana->ventana[3], 0, 0);
             mvwprintw(ventana->ventana[3], 1, 1, "-----  LISTOS  -----");
-            mvwprintw(ventana->ventana[3],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
-                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
-            mvwprintw(ventana->ventana[3],3,1,"---------------------------------------");
+            mvwprintw(ventana->ventana[3],2,1,"%-5s %-5s %-5s %-5s %-5s %-5s %-7s %-10s %-10s %-10s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Priori", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[3],3,1,"----------------------------------------------------------------------------------");
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[3], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
+                mvwprintw(ventana->ventana[3], j+4, 1, "%-5d %-5d %-5d %-5d %-5d %-5d %-7d %-10s %-10s %-10s",
                     aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx, aux->prioridad,
                     aux->nombre, aux->ir, aux->estado);
                 j++;
@@ -223,19 +224,38 @@ void recorrerListas(PCB *arreglo_de_listas[]){
         else if(i == 2){    //Lista de terminados
             lista = arreglo_de_listas[i];
             box(ventana->ventana[4], 0, 0);
-            mvwprintw(ventana->ventana[4],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
-                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
-            mvwprintw(ventana->ventana[4],3,1,"---------------------------------------");
+            mvwprintw(ventana->ventana[4],2,1,"%-5s %-5s %-5s %-5s %-5s %-5s %-7s %-10s %-10s %-10s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Priori", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[4],3,1,"----------------------------------------------------------------------------------");
             j = 0;
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[4], j+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
+                mvwprintw(ventana->ventana[4], j+4, 1, "%-5d %-5d %-5d %-5d %-5d %-5d %-7d %-10s %-10s %-10s",
                     aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx, aux->prioridad,
                     aux->nombre, aux->ir, aux->estado);
                 j++;
             }
             wrefresh(ventana->ventana[4]);
+        }
+        else if(i == 3){    //Lista de nuevos
+            lista = arreglo_de_listas[i];
+            werase(ventana->ventana[5]);
+            box(ventana->ventana[5], 0, 0);
+            mvwprintw(ventana->ventana[5], 1, 1, "-----  NUEVOS  -----");
+            mvwprintw(ventana->ventana[5],2,1,"%-10s %-17s %-15s %-15s",
+                "ID", "Prioridad", "Proceso", "Status");
+            mvwprintw(ventana->ventana[5],3,1,"--------------------------------------------------------------");
+            j = 0;
+            while(lista != NULL){
+                aux = lista;
+                lista = lista->siguiente;
+                mvwprintw(ventana->ventana[5], j+4, 1, "%-10d %-17d %-15s %-15s",
+                    aux->id, aux->prioridad, aux->nombre, strcpy(aux->estado,"NUEVO"));
+                j++;
+                strcpy(aux->estado,"");
+            }
+            wrefresh(ventana->ventana[5]);
         }
     }
 }
@@ -280,6 +300,7 @@ int ejecutarInstruccion(FILE *archivo){
         //END
         if (strcmp("END", token) == 0){
             bandera = 1;
+            sprintf(desc, "Finalizo se encontró la instruccion END en el archivo %s", reg_proceso);
             imprimirError(desc);
             strcpy(reg_estado, "CORRECTO");
             // fclose(archivo);
@@ -292,7 +313,8 @@ int ejecutarInstruccion(FILE *archivo){
         char *operandos = strtok(NULL, "");     //Ax,7
         if (operandos == NULL){
             imprimirFilaConError("Cantidad incorrecta de operandos");
-            return 0;
+            strcpy(reg_estado, "ERROR DE SINTAXIS");
+            return -1;
         }
 
         if (tipo_op == 1){
@@ -300,18 +322,18 @@ int ejecutarInstruccion(FILE *archivo){
                 bandera = 1;
                 strcpy(reg_estado, "ERROR DE SINTAXIS");
                 reg_pc++;
-                return 1;
+                return -1;
             }  
         } else if (tipo_op == 2){
             if(analizadorGpo2(token, operandos)){ 
                 bandera = 1;
                 strcpy(reg_estado, "ERROR DE SINTAXIS");
                 reg_pc++;
-                return 1;
+                return -1;
             }  
         } else{
             imprimirFilaConError("Instrucción no reconocida");
-            return 0;
+            return -1;
         }
         return 0;
     }
@@ -329,8 +351,8 @@ int quantum(){
         if (kbhito()) {
            leerComando(comando);   ////solo llamas si hay entrada
         }
-        sprintf(desc, "[QUANTUM] %d/4 del proceso: %s", Q+1, reg_proceso);
-        imprimirError(desc);
+        sprintf(desc, " %d/4 del proceso: %s", Q+1, reg_proceso);
+        imprimirQuantum(desc);
 
         if(manejador() == 1){
             break;
@@ -365,8 +387,3 @@ int planificadorLP(){
     }
     return mov;
 }
-
-
-
-
-

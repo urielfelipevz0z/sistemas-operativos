@@ -6,7 +6,6 @@ int aluGpo1(char *operacion, char *registro, int *valor){
         imprimirFilaConError("Registro inválido");
         return -1;
     }
-    
     reg_pc++;
     
     if (strcmp("MOV", operacion) == 0){
@@ -39,7 +38,6 @@ int aluGpo2(char *operacion, char *registro){
         imprimirFilaConError("Registro inválido");
         return -1;
     }
-    
     reg_pc++;
     
     if (strcmp("INC", operacion) == 0){
@@ -59,7 +57,7 @@ int analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
     if (strchr(operandos, '.') != NULL){    //cadena[] = {'.','@','_','-',';',':','+','*','/','!'}
 
         imprimirFilaConError("Separador incorrecto");
-        return 1;
+        return -1;
     }
 
     char *registro = strtok(operandos, ",");       //Ax
@@ -67,17 +65,17 @@ int analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
     
     if (valor == NULL){
         imprimirFilaConError("Cantidad incorrecta de operandos");
-        return 1;
+        return -1;
     }
     
     if (validarRegistro(registro) == -1){
         imprimirFilaConError("Registro inválido");
-        return 1;
+        return -1;
     }
     
     if (!esNumeroValido(valor)){
         imprimirFilaConError("Uso incorrecto de valores");
-        return 1;
+        return -1;
     }
 
     int numero = atoi(valor);
@@ -92,17 +90,17 @@ int analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
 int analizadorGpo2(char *tipo_operacion, char *registro){  //INC y Ax
     if (registro == NULL){
         imprimirFilaConError("Cantidad incorrecta de operandos");
-        return 1;
+        return -1;
     }
     
     if (strchr(registro, ',') != NULL){                 //Ax,7 -> truena
         imprimirFilaConError("Cantidad incorrecta de operandos");
-        return 1;
+        return -1;
     }
     
     if (validarRegistro(registro) == -1){
         imprimirFilaConError("Registro inválido");
-        return 1;
+        return -1;
     }
     
     int resultado = aluGpo2(tipo_operacion, registro);
