@@ -13,6 +13,7 @@ void recorrerListas(PCB *arreglo_de_listas[]);
 int leerArchivo(PCB *proceso);
 int ejecutarInstruccion(FILE *archivo);
 
+void insertarPrioridad(PCB *arreglo_de_listas[], PCB *nuevo);
 int quantum();
 int planificadorLP();
 

@@ -133,6 +133,9 @@ void killProceso(PCB *arreglo_de_listas[], int valor) {
 
     // Buscar en la lista de listos (0) y en ejecución (1)
     for (int i = 0; i < 4; i++) {
+        if(i == 2){
+            continue;
+        }
         actual = arreglo_de_listas[i];
         anterior = NULL;
 

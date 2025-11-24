@@ -58,7 +58,7 @@ PCB *crear(char *proceso){
     return nuevo;
 }
 
-void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
+void insertarPrioridad(PCB *arreglo_de_listas[], PCB *nuevo){
     
     PCB *aux;
     PCB *anterior;
@@ -88,6 +88,23 @@ void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
         }
     }
     
+}
+
+
+void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
+    
+    PCB *aux;
+    
+    if(arreglo_de_listas[0] == NULL){
+       arreglo_de_listas[0] = nuevo;
+    }
+    else{
+        aux = arreglo_de_listas[0];
+        while(aux->siguiente != NULL){ //Recorre la lista hasta el final 
+            aux = aux->siguiente;
+        }
+        aux->siguiente = nuevo;
+    }
 }
 
 int manejador(){
@@ -378,7 +395,7 @@ int planificadorLP(){
         aux = arreglo_de_listas[3];         
         arreglo_de_listas[3] = aux->siguiente;
         aux->siguiente = NULL;
-        insertar(&(arreglo_de_listas[0]), aux); //Se mueve el 1er nodo de nuevos a ejecucion
+        insertarPrioridad(&(arreglo_de_listas[0]), aux); //Se mueve el 1er nodo de nuevos a ejecucion
         cant_procesos++;
         mov = 1;
     }
@@ -387,3 +404,4 @@ int planificadorLP(){
     }
     return mov;
 }
+
