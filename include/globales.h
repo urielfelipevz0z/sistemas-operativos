@@ -30,6 +30,10 @@ typedef struct pcb{
     FILE *archivo; //puntero al archivo
     int prioridad; //prioridad del proceso (1-4)
     struct pcb *siguiente; //puntero al siguiente PCB
+
+    int RMax[3];
+    int RAsig[3];
+
 }PCB;
 
 typedef struct ventana{
@@ -43,11 +47,12 @@ extern char reg_proceso[16], reg_ir[16], reg_estado[REG_ESTADO_TAM], comando[TAM
 extern int bandera, cant_procesos;
 extern char desc[256];
 extern int id_listos;
+extern int recursos[3]; //Recursos globales X,Y,Z
 
 extern PCB *aux;
 
 extern buffer *bufferC;
-extern PCB *arreglo_de_listas[4];
+extern PCB *arreglo_de_listas[5];
 extern Ventana *ventana;
 
 static const char *const REGISTROS[] = {"Ax", "Bx", "Cx", "Dx"};

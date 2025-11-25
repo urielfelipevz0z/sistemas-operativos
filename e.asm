@@ -1,3 +1,4 @@
+MAX 1,20,5
 MOV Ax,5
 ADD Bx,7
 

@@ -11,9 +11,14 @@ void eliminar(PCB *arreglo_de_listas[]);
 void recorrerListas(PCB *arreglo_de_listas[]);
 
 int leerArchivo(PCB *proceso);
+int Max(PCB *proceso);
+int MaxRecursos(PCB *proceso);
+int Get(char *linea);
+
+
 int ejecutarInstruccion(FILE *archivo);
 
-void insertarPrioridad(PCB *arreglo_de_listas[], PCB *nuevo);
+void insertarPrioridad(PCB *arreglo_de_listas[],PCB *nuevo);
 int quantum();
 int planificadorLP();
 

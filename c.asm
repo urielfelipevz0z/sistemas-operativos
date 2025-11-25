@@ -1,3 +1,4 @@
+MAX 11,11,11
 MOV Ax,1
 MOV Bx,2
 MOV Cx,3

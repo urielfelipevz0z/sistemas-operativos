@@ -1,4 +1,6 @@
+MAX 1,2,3
 MOV Ax,5
+GET 10,1,1
 ADD Bx,7
 
 

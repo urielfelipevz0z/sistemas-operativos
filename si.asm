@@ -1,3 +1,4 @@
+MAX 1,2,3
 ADD Ax,1
 ADD Bx,1
 ADD Cx,1

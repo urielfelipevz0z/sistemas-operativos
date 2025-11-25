@@ -112,7 +112,7 @@ int manejador(){
     recorrerListas(&(arreglo_de_listas[0]));
 
         if(arreglo_de_listas[1] == NULL){       //Si no hay nada en ejecución
-            aux = arreglo_de_listas[0];         //cargar el 1er nodo de listos 
+            aux = arreglo_de_listas[0];         //cargar el 1er nodo de listos
             arreglo_de_listas[0] = aux->siguiente;
             aux->siguiente = NULL;
             insertar(&(arreglo_de_listas[1]), aux); //Se mueve el 1er nodo de listos a ejecución 
@@ -285,12 +285,8 @@ int leerArchivo(PCB *proceso){  //a.asm
         return -1;
     }
     FILE *f = proceso->archivo;
-    if(ejecutarInstruccion(f)){
-        // fclose(f);
-        // proceso->archivo = NULL;
-        return 1;
-    }
-    return 0;
+    int res = ejecutarInstruccion(f);
+    return res;
 }
 
 int ejecutarInstruccion(FILE *archivo){
@@ -308,7 +304,7 @@ int ejecutarInstruccion(FILE *archivo){
         
         char copia[TAMANIO_LINEA];
         strcpy(copia, linea);
-        char *token = strtok(copia, " ");       //token = MOV
+        char *token = strtok(copia, " ");       //token = MOV, GET
         
         if (token == NULL){
             return 0;
@@ -388,20 +384,123 @@ int quantum(){
     return 0;
 }
 
+int MaxRecursos(PCB* aux){
+    int banderaDois = 0;
+    int mov = 0;
+
+    //Comprobar que lo que solicita MAX sea <= que los recursos X,Y,Z
+        for(int i = 0; i < 3; i++){
+            if(aux->RMax[0] <= recursos[0]){
+                banderaDois++;
+            }
+        }
+        if(banderaDois == 3){
+            insertarPrioridad(&(arreglo_de_listas[0]), aux); //Se mueve el 1er nodo de listos a ejecucion
+            cant_procesos++;
+            mov = 1;
+            recorrerListas(&(arreglo_de_listas[0]));
+            banderaDois = 0;
+        }
+        else{ //no good 
+            insertar(&(arreglo_de_listas[2]), aux);
+            recorrerListas(&(arreglo_de_listas[0]));
+            banderaDois = 0;
+        }
+        return mov;
+}
+
 int planificadorLP(){
     PCB *aux;
     int mov = 0;
-    while(arreglo_de_listas[3] != NULL && cant_procesos < 3){   //Si hay algo en Nuevos y espacio en listos Guardar en Listos
+    while(arreglo_de_listas[3] != NULL){   //Si hay algo en Nuevos y espacio en listos Guardar en Listos
         aux = arreglo_de_listas[3];         
         arreglo_de_listas[3] = aux->siguiente;
         aux->siguiente = NULL;
-        insertarPrioridad(&(arreglo_de_listas[0]), aux); //Se mueve el 1er nodo de nuevos a ejecucion
-        cant_procesos++;
-        mov = 1;
+        //Comprobar que exista la instruccion MAX
+        if(Max(aux) == 1){ // todo good
+            MaxRecursos(aux);
+        }
+        else{ // no good
+            insertar(&(arreglo_de_listas[2]), aux);
+            recorrerListas(&(arreglo_de_listas[0]));
+        }
     }
     if(mov){
         recorrerListas(&(arreglo_de_listas[0]));
     }
     return mov;
 }
+
+int Max(PCB* proceso){
+    char linea[TAMANIO_COMANDO];
+    if (fgets(linea, sizeof(linea), proceso->archivo) != NULL){   //linea = MAX 1,2,3
+        linea[strcspn(linea, "\n")] = 0;
+        
+        char copia[TAMANIO_LINEA];
+        strcpy(copia, linea);
+        char *token = strtok(copia, " ");       //token = MAX
+        
+        if (token == NULL){
+            return 0;
+        }
+
+        if(strcmp("MAX", token) == 0){
+        char *operandos;
+            for(int i = 0; i < 3; i++){
+            operandos = strtok(NULL, ",");     //1 luego 2 luego 3
+                if(!esNumeroValido(operandos)){
+                    imprimirFilaConError("Uso incorrecto de valores");
+                    strcpy(proceso->ir, linea);
+                    strcpy(proceso->estado, "ERROR DE RECURSOS");
+                    return -1;
+                }
+                proceso->RMax[i] = atoi(operandos);
+            }
+        }
+        else{
+            imprimirFilaConError("No MAX");
+            strcpy(proceso->ir, linea);
+            strcpy(proceso->estado, "ERROR DE RECURSOS");
+            return -1;
+        }
+    }
+    return 1;
+}
+
+int Get(char *linea){       //GET 1,2,3
+    PCB *aux = arreglo_de_listas[1];
+    int get[3]= {0,0,0};
+
+    char copia[TAMANIO_LINEA];
+    strcpy(copia, linea);
+    char *token = strtok(copia, " ");       //token = GET
+    
+    if (token == NULL){
+        return 0;
+    }
+
+    if(strcmp("GET", token) == 0){      //GET 1,2,3  despues de la suma Asig <= Globales
+    char *operandos;
+        for(int i = 0; i < 3; i++){
+        operandos = strtok(NULL, ",");     //1 luego 2 luego 3
+            if(!esNumeroValido(operandos)){
+                imprimirFilaConError("Uso incorrecto de valores");
+                strcpy(aux->ir, linea);
+                strcpy(aux->estado, "ERROR DE RECURSOS");
+                return -1;
+            }
+            get[i] = atoi(operandos);   // {1,2,3}
+        }
+        if(get[0] <= recursos[0] && get[1] <= recursos[1] && get[2] <= recursos[2]){
+            aux->RAsig[0] += get[0]; aux->RAsig[1] += get[1]; aux->RAsig[2] += get[2];
+            recursos[0] -= get[0]; recursos[1] -= get[1]; recursos[2] -= get[2];
+        }
+        else{
+            insertar(&(arreglo_de_listas[4]), aux);       //Se inserta en la lista de bloqueados
+        }
+
+    }
+}
+
+
 

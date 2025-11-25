@@ -1,14 +1,16 @@
 duda número 1: ¿El profe es humano?
 
+1.- Leer instruccion MAX 1,2,3, si no existe mandar a terminados con status "Error de recursos" ✅
+2.- X,Y,Z variables globales ✅
+2.1.- ✅
+3.- Instruccion GET 1,0,3 (Realizar resta a las var globales)
+4.- Nueva lista "Bloqueados"
+5.- Nueva instruccion FRE 1,2,3
 
 
 
-
-
-
-
-
-
+#.- Nuevas variables para el PCB RMax_x,RMax_y,RMax_z asi como RAsig_x,RAsig_y,RAsig_z
+#.- Quitar el limite de la lista de listos
 
 
 
