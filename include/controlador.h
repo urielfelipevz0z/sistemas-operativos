@@ -10,11 +10,9 @@
 #include <fcntl.h>
 #include <time.h>
 
+#include "include/globales.h"                       //Contiene la var. globales
 #include "include/cpu.h"
 // #include "include/proceso.h"
-
-
-#include "include/globales.h"                       //Contiene la var. globales
 
 #include "include/proceso.h"
 #include "include/interfaz.h"

@@ -5,9 +5,11 @@
 
 int aluGpo1(char *operacion, char *registro, int *valor);
 int aluGpo2(char *operacion, char *registro);
+int Gpo3(char *operacion, int *valores, PCB *proceso);
 
 int analizadorGpo1(char *tipo_operacion, char *operandos);
 int analizadorGpo2(char *tipo_operacion, char *registro);
+int analizadorGpo3(char *tipo_operacion, char *operandos, PCB *proceso);
 
 int validarRegistro(const char *registro);
 int tipoOperacion(const char *operacion);

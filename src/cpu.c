@@ -53,6 +53,30 @@ int aluGpo2(char *operacion, char *registro){
     return 0;
 }
 
+int Gpo3(char *operacion, int *valores, PCB *proceso){  //GET o FRE, {1,2,3}, proceso
+    if (strcmp("GET", operacion) == 0){
+        //Compara que los valores que solicita sean menores que los recursos globales 
+        if(valores[0] <= recursos[0] && valores[1] <= recursos[1] && valores[2] <= recursos[2]){
+            //Compara que los valores que solicita sean menores que los recursos Maximos solicitados al comienzo
+            if(valores[0] <= proceso->RMax[0] && valores[1] <= proceso->RMax[1] && valores[2] <= proceso->RMax[2]){
+                proceso->RAsig[0] += valores[0]; proceso->RAsig[1] += valores[1]; proceso->RAsig[2] += valores[2];
+                recursos[0] -= proceso->RAsig[0]; recursos[1] -= proceso->RAsig[1]; recursos[2] -= proceso->RAsig[2];
+            }
+            else{
+                //liberador de recursos;
+               insertar(&(arreglo_de_listas[2]), proceso);       //Se inserta en la lista de terminados
+            }
+        }
+        else{
+            insertar(&(arreglo_de_listas[4]), proceso);       //Se inserta en la lista de bloqueados
+        }
+    }else if (strcmp("FRE", operacion) == 0){
+        if(valores[0] <= proceso->RAsig[0] && valores[1] <= proceso->RAsig[1] && valores[2] <= proceso->RAsig[2]){
+            proceso->RAsig[0] -= valores[0]; proceso->RAsig[1] -= valores[1]; proceso->RAsig[2] -= valores[2];
+        }
+    }
+}
+
 int analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
     if (strchr(operandos, '.') != NULL){    //cadena[] = {'.','@','_','-',';',':','+','*','/','!'}
 
@@ -111,6 +135,44 @@ int analizadorGpo2(char *tipo_operacion, char *registro){  //INC y Ax
     return 0;
 }
 
+int analizadorGpo3(char *tipo_operacion, char *operandos, PCB *proceso){     //GET y 1,7,3
+    char *valor;
+    if (strchr(operandos, '.') != NULL){    //cadena[] = {'.','@','_','-',';',':','+','*','/','!'}
+        imprimirFilaConError("Separador incorrecto");
+        return -1;
+    }
+
+    int valores[3];
+    
+    
+    for(int i = 0; i < 3; i++){
+        if(i == 0){
+            valor = strtok(operandos, ","); // 1,2,3 
+        }
+        else{
+            valor = strtok(NULL, ","); // 1,2,3 
+        }
+        if (valor == NULL){
+            imprimirFilaConError("Cantidad incorrecta de operandos");
+            return -1;
+        }   
+        if (!esNumeroValido(valor)){
+            imprimirFilaConError("Uso incorrecto de valores");
+            return -1;
+        }
+        int numero = atoi(valor);
+        valores[i] = numero;
+    }
+
+    int resultado = Gpo3(tipo_operacion, valores, proceso);
+    if (resultado == 0){
+        imprimirFila();
+    }
+     
+    return 0;    
+}
+
+
 int validarRegistro(const char *registro){      //Ax, Bx, etc.
     for (int i = 0; i < NUM_REGISTROS; i++) {
         if (strcmp(REGISTROS[i], registro) == 0){
@@ -132,7 +194,12 @@ int tipoOperacion(const char *operacion){       //MOV
             return 2;
         }
     }
-    
+
+    for (int i = 0; i < NUM_OPS_GPO3; i++){
+        if (strcmp(OPERACIONES_GPO3[i], operacion) == 0){
+            return 3;
+        }
+    }
     return -1;
 }
 

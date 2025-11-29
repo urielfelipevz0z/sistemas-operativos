@@ -8,6 +8,7 @@
 #define NUM_REGISTROS 4
 #define NUM_OPS_GPO1 5
 #define NUM_OPS_GPO2 2
+#define NUM_OPS_GPO3 2
 #define SEGUNDOS 1
 
 
@@ -37,8 +38,8 @@ typedef struct pcb{
 }PCB;
 
 typedef struct ventana{
-    WINDOW *ventana[7];
-    int update[7]; 
+    WINDOW *ventana[9];
+    int update[9]; 
 }Ventana;
 
 extern int reg_ax, reg_bx, reg_cx, reg_dx, Q;
@@ -58,6 +59,7 @@ extern Ventana *ventana;
 static const char *const REGISTROS[] = {"Ax", "Bx", "Cx", "Dx"};
 static const char *const OPERACIONES_GPO1[] = {"MOV", "ADD", "SUB", "MUL", "DIV"};
 static const char *const OPERACIONES_GPO2[] = {"INC", "DEC"};
+static const char *const OPERACIONES_GPO3[] = {"GET", "FRE"};
 
 extern int tiempo;
 

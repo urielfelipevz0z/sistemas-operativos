@@ -256,6 +256,7 @@ void recorrerListas(PCB *arreglo_de_listas[]){
             wrefresh(ventana->ventana[4]);
         }
         else if(i == 3){    //Lista de nuevos
+            
             lista = arreglo_de_listas[i];
             werase(ventana->ventana[5]);
             box(ventana->ventana[5], 0, 0);
@@ -321,9 +322,9 @@ int ejecutarInstruccion(FILE *archivo){
             return 1;
         }
         
-        int tipo_op = tipoOperacion(token);     //1 o 2
+        int tipo_op = tipoOperacion(token);     //1 o 2 o 3
         
-        char *operandos = strtok(NULL, "");     //Ax,7
+        char *operandos = strtok(NULL, "");     //Ax,7 o Ax o 1,2,3
         if (operandos == NULL){
             imprimirFilaConError("Cantidad incorrecta de operandos");
             strcpy(reg_estado, "ERROR DE SINTAXIS");
@@ -344,7 +345,15 @@ int ejecutarInstruccion(FILE *archivo){
                 reg_pc++;
                 return -1;
             }  
-        } else{
+        } else if (tipo_op == 3){
+            if(analizadorGpo3(token, operandos, arreglo_de_listas[1])){
+                bandera = 1;
+                strcpy(reg_estado, "ERROR DE SINTAXIS");
+                reg_pc++;
+                return -1;
+            }  
+        } 
+        else{
             imprimirFilaConError("Instrucción no reconocida");
             return -1;
         }
@@ -361,6 +370,9 @@ int quantum(){
         return 0;
     }
     for(Q = 0; Q < 4 ;Q++){
+        recorrerListas(&(arreglo_de_listas[0]));
+        sprintf(desc, "Recursos-> X:%d Y:%d Z:%d", recursos[0],recursos[1],recursos[2]);
+        imprimirRecursos(desc);
         if (kbhito()) {
            leerComando(comando);   ////solo llamas si hay entrada
         }
@@ -380,55 +392,86 @@ int quantum(){
         recorrerListas(&(arreglo_de_listas[0]));
         arreglo_de_listas[1] = NULL;
     }
-
     return 0;
 }
 
 int MaxRecursos(PCB* aux){
-    int banderaDois = 0;
-    int mov = 0;
-
-    //Comprobar que lo que solicita MAX sea <= que los recursos X,Y,Z
-        for(int i = 0; i < 3; i++){
-            if(aux->RMax[0] <= recursos[0]){
-                banderaDois++;
-            }
-        }
-        if(banderaDois == 3){
+    //Comprobar que lo que solicita MAX sean <= que 10
+    if(aux->RMax[0] <= 10 && aux->RMax[1] <= 10 && aux->RMax[2] <= 10){
+        imprimirDebug("Entro al if: RMax <= 10");
+        //Comprobar que lo que solicita MAX sean <= los recursos disponibles
+        if(aux->RMax[0] <= recursos[0] && aux->RMax[1] <= recursos[1] && aux->RMax[2] <= recursos[2]){
+            imprimirDebug("Entro al if: RMax <= Recursos");
             insertarPrioridad(&(arreglo_de_listas[0]), aux); //Se mueve el 1er nodo de listos a ejecucion
-            cant_procesos++;
-            mov = 1;
             recorrerListas(&(arreglo_de_listas[0]));
-            banderaDois = 0;
+            return 0; //Se logro encolar a listos 
         }
-        else{ //no good 
-            insertar(&(arreglo_de_listas[2]), aux);
-            recorrerListas(&(arreglo_de_listas[0]));
-            banderaDois = 0;
+        else{
+
+            
+            imprimirDebug("Else: No hay recursos disponibles");
+            fseek(aux->archivo, 0, SEEK_SET);
+            insertar(&(arreglo_de_listas[3]), aux); //inserta a nuevos again 
+
+            // //Des-referenciamos el proceso para insertarlo en la lista de ejecución
+            // arreglo_de_listas[3] = aux->siguiente;
+            // aux->siguiente = NULL;
+            
+            // recorrerListas(&(arreglo_de_listas[0]));
+            return 0; //No se logro encolar a listos
         }
-        return mov;
+    }
+    else{ // Los recursos excenden los totales del sistema
+        imprimirDebug("Else: Pides mucho cawn");
+        insertar(&(arreglo_de_listas[2]), aux); //insertamos a terminados
+        recorrerListas(&(arreglo_de_listas[0]));
+        return 0; //Se manda a terminados no hay que realizar nada mas 
+    }
+    return -1;
 }
 
 int planificadorLP(){
     PCB *aux;
     int mov = 0;
-    while(arreglo_de_listas[3] != NULL){   //Si hay algo en Nuevos y espacio en listos Guardar en Listos
-        aux = arreglo_de_listas[3];         
+    
+    if(arreglo_de_listas[3] != NULL){
+        aux = arreglo_de_listas[3];
         arreglo_de_listas[3] = aux->siguiente;
         aux->siguiente = NULL;
-        //Comprobar que exista la instruccion MAX
-        if(Max(aux) == 1){ // todo good
-            MaxRecursos(aux);
+
+        if(Max(aux) == 1){ // Existe la instruccion MAX
+            if(MaxRecursos(aux) == -1){   //Salio mal
+                imprimirDebug("Trono en algo");
+            }
         }
-        else{ // no good
+        else{ //Si no exite la instruccion MAX insertar en Terminados
             insertar(&(arreglo_de_listas[2]), aux);
             recorrerListas(&(arreglo_de_listas[0]));
         }
+
     }
-    if(mov){
-        recorrerListas(&(arreglo_de_listas[0]));
-    }
-    return mov;
+
+
+
+
+
+    // while(arreglo_de_listas[3] != NULL){   //Si hay algo en Nuevos y espacio en listos Guardar en Listos
+    //     aux = arreglo_de_listas[3];         
+    //     arreglo_de_listas[3] = aux->siguiente;
+    //     aux->siguiente = NULL;
+    //     //Comprobar que exista la instruccion MAX
+    //     if(Max(aux) == 1){ // todo good
+    //         MaxRecursos(aux);
+    //     }
+    //     else{ //Si no exite la instruccion MAX insertar en Terminados
+    //         insertar(&(arreglo_de_listas[2]), aux);
+    //         recorrerListas(&(arreglo_de_listas[0]));
+    //     }
+    // }
+    // if(mov){
+    //     recorrerListas(&(arreglo_de_listas[0]));
+    // }
+    // return mov;
 }
 
 int Max(PCB* proceso){

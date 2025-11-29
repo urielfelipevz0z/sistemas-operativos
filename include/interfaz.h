@@ -5,6 +5,8 @@
 
 
 void imprimirError(char *mensaje);
+void imprimirDebug(char *mensaje);
+void imprimirRecursos(char *mensaje);
 void imprimirEncabezadoEjecucion(void);
 void imprimirEncabezadoListos(void);
 void imprimirEncabezadoterminado(void);
@@ -24,6 +26,8 @@ void ventanaListos(Ventana *ventana);
 void ventanaTerminados(Ventana *ventana);
 void ventanaNuevos(Ventana *ventana);
 void ventanaQuantum(Ventana *ventana);
+void ventanaDebug(Ventana *ventana);
+void ventanaRecursos(Ventana *ventana);
 
 void actualizaVentanas(Ventana *ventan, buffer *bufferCa);
 

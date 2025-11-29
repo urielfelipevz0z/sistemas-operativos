@@ -1,6 +1,6 @@
-MAX 1,2,3
+MAX 10,10,10
 MOV Ax,5
-GET 10,1,1
+GET 1,2,7
 ADD Bx,7
 
 

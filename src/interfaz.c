@@ -10,6 +10,24 @@ void imprimirError(char *mensaje){
     wrefresh(ventana->ventana[0]);
 }
 
+void imprimirDebug(char *mensaje){
+    werase(ventana->ventana[7]);
+    box(ventana->ventana[7], 0, 0);
+    mvwprintw(ventana->ventana[7], 1, 1, "%s", mensaje);
+    wrefresh(ventana->ventana[7]);
+    wmove(ventana->ventana[7], 1, 4);
+    wrefresh(ventana->ventana[7]);
+}
+
+void imprimirRecursos(char *mensaje){
+    werase(ventana->ventana[8]);
+    box(ventana->ventana[8], 0, 0);
+    mvwprintw(ventana->ventana[8], 1, 1, "%s", mensaje);
+    wrefresh(ventana->ventana[8]);
+    wmove(ventana->ventana[8], 1, 4);
+    wrefresh(ventana->ventana[8]);
+}
+
 void imprimirQuantum(char *mensaje){
     werase(ventana->ventana[6]);
     box(ventana->ventana[6], 0, 0);
@@ -83,13 +101,17 @@ void inicializarVentanas(Ventana *ventana){
     ventana->ventana[4] = newwin(16,87,21,65);   //Lista de Terminados
     ventana->ventana[5] = newwin(31,65,6,0);   //Lista de Nuevos
     ventana->ventana[6] = newwin(3,65,3,0);    //Mensajes quantum
+    ventana->ventana[7] = newwin(3,100,37,0);    //Mensajes quantum
+    ventana->ventana[8] = newwin(3,50,37,101);    //Mensajes quantum
     ventana->update[0] = 1;
     ventana->update[1] = 1;
     ventana->update[2] = 1;
     ventana->update[3] = 1;
     ventana->update[4] = 1;
     ventana->update[5] = 1;
-    ventana->update[5] = 1;
+    ventana->update[6] = 1;
+    ventana->update[7] = 1;
+    ventana->update[8] = 1;
 }
 
 void imprimirVentanas(Ventana *ventana){
@@ -100,6 +122,8 @@ void imprimirVentanas(Ventana *ventana){
     ventanaTerminados(ventana);
     ventanaNuevos(ventana);
     ventanaQuantum(ventana);
+    ventanaDebug(ventana);
+    ventanaRecursos(ventana);
 }
 
 void ventanaPromt(Ventana *ventana){
@@ -164,5 +188,16 @@ void actualizaVentanas(Ventana *ventana, buffer *bufferC){
     }
 }
 
+void ventanaDebug(Ventana *ventana){
+    werase(ventana->ventana[7]);                    //Borrar todo el contenido de la ventana
+    box(ventana->ventana[7], 0, 0);                 //Dibujar nuevamente el borde de la ventana
+    mvwprintw(ventana->ventana[7], 1, 1, "$$ ");    //Imprimir prompt 
+    wmove(ventana->ventana[7], 1, 4);
+    wrefresh(ventana->ventana[7]);
+}
 
-
+void ventanaRecursos(Ventana *ventana){
+    werase(ventana->ventana[8]);                    //Borrar todo el contenido de la ventana
+    box(ventana->ventana[8], 0, 0);                 //Dibujar nuevamente el borde de la ventana
+    wrefresh(ventana->ventana[8]);
+}
