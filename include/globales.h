@@ -34,6 +34,7 @@ typedef struct pcb{
 
     int RMax[3];
     int RAsig[3];
+    int RGet[3];  // Último GET que causó bloqueo (para reintentar)
 
 }PCB;
 

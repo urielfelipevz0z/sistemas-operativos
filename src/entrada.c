@@ -27,6 +27,7 @@ int extraerComando(buffer *bufferC){    //ejecuta a.asm     o   salir
         strcpy(bufferC->argumento, token); // a.asm b.asm c.asm Meter while abajo
         
         gestorProcesos(bufferC->argumento, &(arreglo_de_listas[0]));
+        return 0;
 
     }
     else if(strcmp("kill", bufferC->comando) == 0){
@@ -148,6 +149,7 @@ void killProceso(PCB *arreglo_de_listas[], int valor) {
                 }
                 actual->siguiente = NULL;
                 strcpy(actual->estado, "Terminado por KILL");
+                liberarRecursos(actual);   //Liberar recursos antes de terminar
                 insertar(&(arreglo_de_listas[2]), actual);
                 cant_procesos --;
                 return;

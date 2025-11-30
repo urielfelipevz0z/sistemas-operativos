@@ -11,12 +11,12 @@ void imprimirError(char *mensaje){
 }
 
 void imprimirDebug(char *mensaje){
-    werase(ventana->ventana[7]);
-    box(ventana->ventana[7], 0, 0);
-    mvwprintw(ventana->ventana[7], 1, 1, "%s", mensaje);
-    wrefresh(ventana->ventana[7]);
-    wmove(ventana->ventana[7], 1, 4);
-    wrefresh(ventana->ventana[7]);
+    werase(ventana->ventana[1]);
+    box(ventana->ventana[1], 0, 0);
+    mvwprintw(ventana->ventana[1], 1, 1, "[DEBUG] %s", mensaje);
+    wrefresh(ventana->ventana[1]);
+    wmove(ventana->ventana[0], 1, 4);
+    wrefresh(ventana->ventana[0]);
 }
 
 void imprimirRecursos(char *mensaje){
@@ -66,43 +66,17 @@ void imprimirTabla(void){
     imprimirFila();
 }
 
-void imprimirListos(PCB *nodo, int renglon){
-    werase(ventana->ventana[3]);
-    box(ventana->ventana[3], 0, 0);
-    mvwprintw(ventana->ventana[3], 1, 1, "-----  LISTOS  -----");
-    mvwprintw(ventana->ventana[3],2,1,"%-6s %-6s %-6s %-6s %-6s %-6s %-6s %-14s %-21s %s",
-           "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
-    mvwprintw(ventana->ventana[3],3,1,"---------------------------------------");
-    mvwprintw(ventana->ventana[3], renglon+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
-           nodo->id, nodo->pc, nodo->ax, nodo->bx, nodo->cx, nodo->dx, nodo->prioridad,
-           nodo->nombre, nodo->ir, nodo->estado);
-    wrefresh(ventana->ventana[3]);
-    usleep(tiempo);
-}
-
-void imprimirTerminados(PCB *nodo, int renglon){
-    box(ventana->ventana[4], 0, 0);
-    mvwprintw(ventana->ventana[4],2,1,"%-6s%-6s%-6s%-6s%-6s%-6s%-6s%-14s%-21s%s",
-           "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
-    mvwprintw(ventana->ventana[4],3,1,"---------------------------------------");
-    mvwprintw(ventana->ventana[4], renglon+4, 1, "%-6d%-6d%-6d%-6d%-6d%-6d%-6d%-14s%-21s%s",
-           nodo->id, nodo->pc, nodo->ax, nodo->bx, nodo->cx, nodo->dx, nodo->prioridad,
-           nodo->nombre, nodo->ir, nodo->estado);
-    wrefresh(ventana->ventana[4]);
-    usleep(tiempo);
-}
-
 void inicializarVentanas(Ventana *ventana){
 
-    ventana->ventana[0] = newwin(3,139,0,7);    //Promt
-    ventana->ventana[1] = newwin(3,87,3,65);    //Mensajes de error
-    ventana->ventana[2] = newwin(7,87,14,65);    //Lista de Ejecucion
-    ventana->ventana[3] = newwin(8,87,6,65);   //Lista de Listos
-    ventana->ventana[4] = newwin(16,87,21,65);   //Lista de Terminados
-    ventana->ventana[5] = newwin(31,65,6,0);   //Lista de Nuevos
-    ventana->ventana[6] = newwin(3,65,3,0);    //Mensajes quantum
-    ventana->ventana[7] = newwin(3,100,37,0);    //Mensajes quantum
-    ventana->ventana[8] = newwin(3,50,37,101);    //Mensajes quantum
+    ventana->ventana[0] = newwin(3,152,0,0);      //Promt
+    ventana->ventana[1] = newwin(3,87,3,65);      //Mensajes de error/debug
+    ventana->ventana[2] = newwin(7,87,14,65);     //Lista de Ejecucion (7 filas)
+    ventana->ventana[3] = newwin(8,87,6,65);      //Lista de Listos (8 filas = 4 procesos)
+    ventana->ventana[4] = newwin(16,87,21,65);    //Lista de Terminados (16 filas = 12 procesos)
+    ventana->ventana[5] = newwin(15,65,6,0);      //Lista de Nuevos (15 filas = 11 procesos)
+    ventana->ventana[6] = newwin(3,65,3,0);       //Mensajes quantum
+    ventana->ventana[7] = newwin(16,65,21,0);     //Lista de Bloqueados (16 filas = 12 procesos)
+    ventana->ventana[8] = newwin(3,152,37,0);     //Recursos globales
     ventana->update[0] = 1;
     ventana->update[1] = 1;
     ventana->update[2] = 1;
@@ -122,7 +96,7 @@ void imprimirVentanas(Ventana *ventana){
     ventanaTerminados(ventana);
     ventanaNuevos(ventana);
     ventanaQuantum(ventana);
-    ventanaDebug(ventana);
+    ventanaBloqueados(ventana);
     ventanaRecursos(ventana);
 }
 
@@ -182,22 +156,17 @@ void ventanaQuantum(Ventana *ventana){
     wrefresh(ventana->ventana[6]);
 }
 
-void actualizaVentanas(Ventana *ventana, buffer *bufferC){
-    if(ventana->update[0]){
-        //printbuffer(ventana, bufferC);
-    }
-}
-
-void ventanaDebug(Ventana *ventana){
-    werase(ventana->ventana[7]);                    //Borrar todo el contenido de la ventana
-    box(ventana->ventana[7], 0, 0);                 //Dibujar nuevamente el borde de la ventana
-    mvwprintw(ventana->ventana[7], 1, 1, "$$ ");    //Imprimir prompt 
-    wmove(ventana->ventana[7], 1, 4);
+void ventanaBloqueados(Ventana *ventana){
+    werase(ventana->ventana[7]);
+    mvwprintw(ventana->ventana[7], 1, 1, "----- BLOQUEADOS -----");
+    box(ventana->ventana[7], 0, 0);
+    ventana->update[7] = 0;
     wrefresh(ventana->ventana[7]);
 }
 
 void ventanaRecursos(Ventana *ventana){
-    werase(ventana->ventana[8]);                    //Borrar todo el contenido de la ventana
-    box(ventana->ventana[8], 0, 0);                 //Dibujar nuevamente el borde de la ventana
+    werase(ventana->ventana[8]);
+    mvwprintw(ventana->ventana[8], 1, 1, "Recursos Globales:");
+    box(ventana->ventana[8], 0, 0);
     wrefresh(ventana->ventana[8]);
 }

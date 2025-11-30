@@ -60,21 +60,38 @@ int Gpo3(char *operacion, int *valores, PCB *proceso){  //GET o FRE, {1,2,3}, pr
             //Compara que los valores que solicita sean menores que los recursos Maximos solicitados al comienzo
             if(valores[0] <= proceso->RMax[0] && valores[1] <= proceso->RMax[1] && valores[2] <= proceso->RMax[2]){
                 proceso->RAsig[0] += valores[0]; proceso->RAsig[1] += valores[1]; proceso->RAsig[2] += valores[2];
-                recursos[0] -= proceso->RAsig[0]; recursos[1] -= proceso->RAsig[1]; recursos[2] -= proceso->RAsig[2];
+                recursos[0] -= valores[0]; recursos[1] -= valores[1]; recursos[2] -= valores[2];
             }
             else{
-                //liberador de recursos;
-               insertar(&(arreglo_de_listas[2]), proceso);       //Se inserta en la lista de terminados
+                //Solicita más recursos de los permitidos en MAX - terminar con error
+                strcpy(proceso->estado, "ERROR: GET > MAX");
+                liberarRecursos(proceso);   //Liberar recursos antes de terminar
+                return -2;  // Código especial para mover a terminados
             }
         }
         else{
-            insertar(&(arreglo_de_listas[4]), proceso);       //Se inserta en la lista de bloqueados
+            //No hay recursos disponibles - bloquear proceso
+            strcpy(proceso->estado, "BLOQUEADO por recursos");
+            // Guardar los valores solicitados para reintentar después
+            proceso->RGet[0] = valores[0];
+            proceso->RGet[1] = valores[1];
+            proceso->RGet[2] = valores[2];
+            return -3;  // Código especial para mover a bloqueados
         }
     }else if (strcmp("FRE", operacion) == 0){
-        if(valores[0] <= proceso->RAsig[0] && valores[1] <= proceso->RAsig[1] && valores[2] <= proceso->RAsig[2]){
-            proceso->RAsig[0] -= valores[0]; proceso->RAsig[1] -= valores[1]; proceso->RAsig[2] -= valores[2];
+        // Validar que no intente liberar más de lo que tiene asignado
+        if(valores[0] > proceso->RAsig[0] || valores[1] > proceso->RAsig[1] || valores[2] > proceso->RAsig[2]){
+            strcpy(proceso->estado, "ERROR: FRE > RAsig");
+            liberarRecursos(proceso);   //Liberar recursos antes de terminar
+            return -2;  // Terminar con error
         }
+        // Liberar recursos
+        proceso->RAsig[0] -= valores[0]; proceso->RAsig[1] -= valores[1]; proceso->RAsig[2] -= valores[2];
+        recursos[0] += valores[0]; recursos[1] += valores[1]; recursos[2] += valores[2];
+        // Después de liberar recursos, revisar si se pueden desbloquear procesos
+        planificadorMP();
     }
+    return 0;
 }
 
 int analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
@@ -167,6 +184,14 @@ int analizadorGpo3(char *tipo_operacion, char *operandos, PCB *proceso){     //G
     int resultado = Gpo3(tipo_operacion, valores, proceso);
     if (resultado == 0){
         imprimirFila();
+    } else if (resultado == -2){
+        // Error de recursos - el proceso debe terminar
+        imprimirFilaConError(proceso->estado);
+        return -2;
+    } else if (resultado == -3){
+        // Recursos insuficientes - bloquear proceso
+        imprimirFilaConError(proceso->estado);
+        return -3;
     }
      
     return 0;    

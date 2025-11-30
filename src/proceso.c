@@ -46,6 +46,17 @@ PCB *crear(char *proceso){
     nuevo->cx = 0;
     nuevo->dx = 0;
     
+    // Inicializar recursos
+    nuevo->RMax[0] = 0;
+    nuevo->RMax[1] = 0;
+    nuevo->RMax[2] = 0;
+    nuevo->RAsig[0] = 0;
+    nuevo->RAsig[1] = 0;
+    nuevo->RAsig[2] = 0;
+    nuevo->RGet[0] = 0;
+    nuevo->RGet[1] = 0;
+    nuevo->RGet[2] = 0;
+    
     strcpy(nuevo->ir, "");
     strcpy(nuevo->estado, "");
     strcpy(nuevo->nombre, proceso); //a.asm
@@ -107,6 +118,20 @@ void insertar(PCB *arreglo_de_listas[], PCB *nuevo){
     }
 }
 
+void liberarRecursos(PCB *proceso){
+    
+    recursos[0] += proceso->RAsig[0];
+    recursos[1] += proceso->RAsig[1];
+    recursos[2] += proceso->RAsig[2];
+    
+    proceso->RAsig[0] = 0;
+    proceso->RAsig[1] = 0;
+    proceso->RAsig[2] = 0;
+    
+    // Después de liberar recursos, revisar si se pueden desbloquear procesos
+    planificadorMP();
+}
+
 int manejador(){
     if(arreglo_de_listas[0] != NULL){       //Hay algo en listos?
     recorrerListas(&(arreglo_de_listas[0]));
@@ -133,7 +158,8 @@ int manejador(){
                     fclose(aux->archivo);
                     aux->archivo = NULL;
                 }
-                aux->siguiente = NULL;  
+                aux->siguiente = NULL;
+                liberarRecursos(aux);   //Liberar recursos antes de terminar
                 insertar(&(arreglo_de_listas[2]), aux); //Se manda a terminados
                 cant_procesos--;
                 recorrerListas(&(arreglo_de_listas[0]));
@@ -148,7 +174,9 @@ int manejador(){
 
         }
         else{       //Hay algo en ejecucion
-            if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
+            int res = ejecutarInstruccion(arreglo_de_listas[1]->archivo);
+            if(res == 1){
+                // Proceso terminó
                 aux = arreglo_de_listas[1];
                 arreglo_de_listas[1] = NULL;
                 guardarContexto(&aux[0]);
@@ -157,6 +185,7 @@ int manejador(){
                     aux->archivo = NULL;
                 }
                 aux->siguiente = NULL;
+                liberarRecursos(aux);   //Liberar recursos antes de terminar
                 insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
                 cant_procesos--;
                 recorrerListas(&(arreglo_de_listas[0]));
@@ -167,11 +196,22 @@ int manejador(){
                 }
                 imprimirEncabezadoEjecucion();
                 return 1;   //Si se termina el proceso termina el ciclo FOR Q
+            } else if(res == 2){
+                // Proceso bloqueado por recursos
+                aux = arreglo_de_listas[1];
+                arreglo_de_listas[1] = NULL;
+                guardarContexto(&aux[0]);
+                aux->siguiente = NULL;
+                insertar(&(arreglo_de_listas[4]), aux);   //Se mueve a bloqueados
+                recorrerListas(&(arreglo_de_listas[0]));
+                imprimirEncabezadoEjecucion();
+                return 1;   //Termina el ciclo FOR Q
             }
         }      
     }
     else if(arreglo_de_listas[1] != NULL){       //Entra cuando no hay nada en listos pero si en ejecución
-        if(ejecutarInstruccion(arreglo_de_listas[1]->archivo)){
+        int res = ejecutarInstruccion(arreglo_de_listas[1]->archivo);
+        if(res == 1){
             aux = arreglo_de_listas[1];
             arreglo_de_listas[1] = NULL;
             guardarContexto(&aux[0]); 
@@ -180,6 +220,7 @@ int manejador(){
             aux->archivo = NULL;
             }
             aux->siguiente = NULL;
+            liberarRecursos(aux);   //Liberar recursos antes de terminar
             insertar(&(arreglo_de_listas[2]), aux);   //Se mueve el nodo de ejecución a terminados 
             cant_procesos--;
             recorrerListas(&(arreglo_de_listas[0]));
@@ -190,6 +231,16 @@ int manejador(){
             }
             imprimirEncabezadoEjecucion();            
             return 1;       //Si se termina el proceso termina el ciclo FOR Q
+        } else if(res == 2){
+            // Proceso bloqueado por recursos
+            aux = arreglo_de_listas[1];
+            arreglo_de_listas[1] = NULL;
+            guardarContexto(&aux[0]);
+            aux->siguiente = NULL;
+            insertar(&(arreglo_de_listas[4]), aux);   //Se mueve a bloqueados
+            recorrerListas(&(arreglo_de_listas[0]));
+            imprimirEncabezadoEjecucion();
+            return 1;       //Termina el ciclo FOR Q
         }
     }
     return 0;
@@ -217,63 +268,82 @@ void recorrerListas(PCB *arreglo_de_listas[]){
     PCB *lista;
     int j;
 
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < 5; i++){
         j = 0;
-        if(i == 0){ //lista de listos
+        if(i == 0){ //lista de listos (Ventana 87 chars)
             lista = arreglo_de_listas[i];
-            // Limpia y dibuja la ventana solo una vez
             werase(ventana->ventana[3]);
             box(ventana->ventana[3], 0, 0);
             mvwprintw(ventana->ventana[3], 1, 1, "-----  LISTOS  -----");
-            mvwprintw(ventana->ventana[3],2,1,"%-5s %-5s %-5s %-5s %-5s %-5s %-7s %-10s %-10s %-10s",
-                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Priori", "Proceso", "IR", "Status");
-            mvwprintw(ventana->ventana[3],3,1,"----------------------------------------------------------------------------------");
+            mvwprintw(ventana->ventana[3],2,1,"%-3s %-3s %-4s %-4s %-4s %-4s %-5s %-12s %-12s %-18s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[3],3,1,"--------------------------------------------------------------------------------");
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[3], j+4, 1, "%-5d %-5d %-5d %-5d %-5d %-5d %-7d %-10s %-10s %-10s",
+                mvwprintw(ventana->ventana[3], j+4, 1, "%-3d %-3d %-4d %-4d %-4d %-4d %-5d %-12s %-12s %-18s",
                     aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx, aux->prioridad,
                     aux->nombre, aux->ir, aux->estado);
                 j++;
             }
             wrefresh(ventana->ventana[3]);
         }
-        else if(i == 2){    //Lista de terminados
+        else if(i == 2){    //Lista de terminados (Ventana 87 chars)
             lista = arreglo_de_listas[i];
+            werase(ventana->ventana[4]);
             box(ventana->ventana[4], 0, 0);
-            mvwprintw(ventana->ventana[4],2,1,"%-5s %-5s %-5s %-5s %-5s %-5s %-7s %-10s %-10s %-10s",
-                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Priori", "Proceso", "IR", "Status");
-            mvwprintw(ventana->ventana[4],3,1,"----------------------------------------------------------------------------------");
+            mvwprintw(ventana->ventana[4], 1, 1, "----- TERMINADOS -----");
+            mvwprintw(ventana->ventana[4],2,1,"%-3s %-3s %-4s %-4s %-4s %-4s %-5s %-12s %-12s %-18s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[4],3,1,"--------------------------------------------------------------------------------");
             j = 0;
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[4], j+4, 1, "%-5d %-5d %-5d %-5d %-5d %-5d %-7d %-10s %-10s %-10s",
+                mvwprintw(ventana->ventana[4], j+4, 1, "%-3d %-3d %-4d %-4d %-4d %-4d %-5d %-12s %-12s %-18s",
                     aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx, aux->prioridad,
                     aux->nombre, aux->ir, aux->estado);
                 j++;
             }
             wrefresh(ventana->ventana[4]);
         }
-        else if(i == 3){    //Lista de nuevos
-            
+        else if(i == 3){    //Lista de nuevos (Ventana 65 chars - solo datos relevantes)
             lista = arreglo_de_listas[i];
             werase(ventana->ventana[5]);
             box(ventana->ventana[5], 0, 0);
             mvwprintw(ventana->ventana[5], 1, 1, "-----  NUEVOS  -----");
-            mvwprintw(ventana->ventana[5],2,1,"%-10s %-17s %-15s %-15s",
-                "ID", "Prioridad", "Proceso", "Status");
-            mvwprintw(ventana->ventana[5],3,1,"--------------------------------------------------------------");
+            mvwprintw(ventana->ventana[5],2,1,"%-4s %-6s %-15s %-10s %-18s",
+                "ID", "Prior", "Proceso", "RMax", "Status");
+            mvwprintw(ventana->ventana[5],3,1,"-------------------------------------------------------------");
             j = 0;
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[5], j+4, 1, "%-10d %-17d %-15s %-15s",
-                    aux->id, aux->prioridad, aux->nombre, strcpy(aux->estado,"NUEVO"));
+                char rmax[12];
+                sprintf(rmax, "%d,%d,%d", aux->RMax[0], aux->RMax[1], aux->RMax[2]);
+                mvwprintw(ventana->ventana[5], j+4, 1, "%-4d %-6d %-15s %-10s %-18s",
+                    aux->id, aux->prioridad, aux->nombre, rmax, "NUEVO");
                 j++;
-                strcpy(aux->estado,"");
             }
             wrefresh(ventana->ventana[5]);
+        }
+        else if(i == 4){    //Lista de bloqueados (Ventana 65 chars - datos relevantes)
+            lista = arreglo_de_listas[i];
+            werase(ventana->ventana[7]);
+            box(ventana->ventana[7], 0, 0);
+            mvwprintw(ventana->ventana[7], 1, 1, "----- BLOQUEADOS -----");
+            mvwprintw(ventana->ventana[7],2,1,"%-4s %-4s %-6s %-12s %-12s %-16s",
+                "ID", "PC", "Prior", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[7],3,1,"-------------------------------------------------------------");
+            j = 0;
+            while(lista != NULL){
+                aux = lista;
+                lista = lista->siguiente;
+                mvwprintw(ventana->ventana[7], j+4, 1, "%-4d %-4d %-6d %-12s %-12s %-16s",
+                    aux->id, aux->pc, aux->prioridad, aux->nombre, aux->ir, aux->estado);
+                j++;
+            }
+            wrefresh(ventana->ventana[7]);
         }
     }
 }
@@ -346,7 +416,19 @@ int ejecutarInstruccion(FILE *archivo){
                 return -1;
             }  
         } else if (tipo_op == 3){
-            if(analizadorGpo3(token, operandos, arreglo_de_listas[1])){
+            int res = analizadorGpo3(token, operandos, arreglo_de_listas[1]);
+            if(res == -2){
+                // Error de recursos - terminar el proceso
+                bandera = 1;
+                strcpy(reg_estado, arreglo_de_listas[1]->estado);
+                reg_pc++;
+                return 1;  // Retornar 1 para terminar el proceso
+            } else if(res == -3){
+                // Recursos insuficientes - bloquear proceso
+                bandera = 1;
+                strcpy(reg_estado, arreglo_de_listas[1]->estado);
+                return 2;  // Retornar 2 para bloquear el proceso
+            } else if(res != 0){
                 bandera = 1;
                 strcpy(reg_estado, "ERROR DE SINTAXIS");
                 reg_pc++;
@@ -369,6 +451,9 @@ int quantum(){
     if(planificadorLP()){
         return 0;
     }
+    // Revisar procesos bloqueados antes de ejecutar
+    planificadorMP();
+    
     for(Q = 0; Q < 4 ;Q++){
         recorrerListas(&(arreglo_de_listas[0]));
         sprintf(desc, "Recursos-> X:%d Y:%d Z:%d", recursos[0],recursos[1],recursos[2]);
@@ -380,6 +465,8 @@ int quantum(){
         imprimirQuantum(desc);
 
         if(manejador() == 1){
+            // Revisar si se pueden desbloquear procesos
+            planificadorMP();
             break;
         }
     }
@@ -396,52 +483,33 @@ int quantum(){
 }
 
 int MaxRecursos(PCB* aux){
-    //Comprobar que lo que solicita MAX sean <= que 10
+    //Comprobar que lo que solicita MAX sean <= que los recursos totales del sistema (10)
     if(aux->RMax[0] <= 10 && aux->RMax[1] <= 10 && aux->RMax[2] <= 10){
-        imprimirDebug("Entro al if: RMax <= 10");
-        //Comprobar que lo que solicita MAX sean <= los recursos disponibles
-        if(aux->RMax[0] <= recursos[0] && aux->RMax[1] <= recursos[1] && aux->RMax[2] <= recursos[2]){
-            imprimirDebug("Entro al if: RMax <= Recursos");
-            insertarPrioridad(&(arreglo_de_listas[0]), aux); //Se mueve el 1er nodo de listos a ejecucion
-            recorrerListas(&(arreglo_de_listas[0]));
-            return 0; //Se logro encolar a listos 
-        }
-        else{
-
-            
-            imprimirDebug("Else: No hay recursos disponibles");
-            fseek(aux->archivo, 0, SEEK_SET);
-            insertar(&(arreglo_de_listas[3]), aux); //inserta a nuevos again 
-
-            // //Des-referenciamos el proceso para insertarlo en la lista de ejecución
-            // arreglo_de_listas[3] = aux->siguiente;
-            // aux->siguiente = NULL;
-            
-            // recorrerListas(&(arreglo_de_listas[0]));
-            return 0; //No se logro encolar a listos
-        }
+        // Si los recursos son válidos para el sistema, insertar en listos
+        // El bloqueo por falta de recursos se maneja cuando ejecuta GET, no aquí
+        insertarPrioridad(&(arreglo_de_listas[0]), aux);
+        recorrerListas(&(arreglo_de_listas[0]));
+        return 0; //Se logro encolar a listos 
     }
-    else{ // Los recursos excenden los totales del sistema
-        imprimirDebug("Else: Pides mucho cawn");
+    else{ // Los recursos exceden los totales del sistema - proceso inválido
+        liberarRecursos(aux);   //Liberar recursos antes de terminar
         insertar(&(arreglo_de_listas[2]), aux); //insertamos a terminados
         recorrerListas(&(arreglo_de_listas[0]));
         return 0; //Se manda a terminados no hay que realizar nada mas 
     }
-    return -1;
 }
 
 int planificadorLP(){
     PCB *aux;
-    int mov = 0;
     
-    if(arreglo_de_listas[3] != NULL){
+    while(arreglo_de_listas[3] != NULL){
         aux = arreglo_de_listas[3];
         arreglo_de_listas[3] = aux->siguiente;
         aux->siguiente = NULL;
 
         if(Max(aux) == 1){ // Existe la instruccion MAX
             if(MaxRecursos(aux) == -1){   //Salio mal
-                imprimirDebug("Trono en algo");
+                // Error en recursos
             }
         }
         else{ //Si no exite la instruccion MAX insertar en Terminados
@@ -472,6 +540,53 @@ int planificadorLP(){
     //     recorrerListas(&(arreglo_de_listas[0]));
     // }
     // return mov;
+    return 0;
+}
+
+int planificadorMP(){
+    // Planificador a Mediano Plazo - revisa procesos bloqueados
+    // Solo desbloquea el PRIMER proceso que pueda obtener recursos
+    PCB *aux;
+    PCB *anterior = NULL;
+    PCB *actual = arreglo_de_listas[4];  // Lista de bloqueados
+    
+    while(actual != NULL){
+        // Verificar si ahora hay recursos suficientes para el GET pendiente
+        if(actual->RGet[0] <= recursos[0] && 
+           actual->RGet[1] <= recursos[1] && 
+           actual->RGet[2] <= recursos[2]){
+            
+            // Hay recursos suficientes - desbloquear este proceso
+            aux = actual;
+            
+            // Remover de lista de bloqueados
+            if(anterior == NULL){
+                arreglo_de_listas[4] = actual->siguiente;
+            } else {
+                anterior->siguiente = actual->siguiente;
+            }
+            
+            aux->siguiente = NULL;
+            
+            // Cambiar estado y mover a listos
+            strcpy(aux->estado, "LISTO");
+            insertarPrioridad(&(arreglo_de_listas[0]), aux);
+            
+            sprintf(desc, "Proceso ID:%d desbloqueado - reintentará GET", aux->id);
+            imprimirError(desc);
+            
+            recorrerListas(&(arreglo_de_listas[0]));
+            
+            // Solo desbloquear UN proceso por llamada
+            return 1;
+        }
+        
+        // No hay recursos suficientes para este proceso, seguir al siguiente
+        anterior = actual;
+        actual = actual->siguiente;
+    }
+    
+    return 0;  // No se desbloqueó ningún proceso
 }
 
 int Max(PCB* proceso){
@@ -543,6 +658,7 @@ int Get(char *linea){       //GET 1,2,3
         }
 
     }
+    return 0;
 }
 
 

@@ -14,6 +14,7 @@ int leerArchivo(PCB *proceso);
 int Max(PCB *proceso);
 int MaxRecursos(PCB *proceso);
 int Get(char *linea);
+void liberarRecursos(PCB *proceso);
 
 
 int ejecutarInstruccion(FILE *archivo);
@@ -21,5 +22,6 @@ int ejecutarInstruccion(FILE *archivo);
 void insertarPrioridad(PCB *arreglo_de_listas[],PCB *nuevo);
 int quantum();
 int planificadorLP();
+int planificadorMP();
 
 #endif
