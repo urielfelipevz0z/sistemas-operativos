@@ -39,8 +39,8 @@ typedef struct pcb{
 }PCB;
 
 typedef struct ventana{
-    WINDOW *ventana[9];
-    int update[9]; 
+    WINDOW *ventana[10];
+    int update[10];
 }Ventana;
 
 extern int reg_ax, reg_bx, reg_cx, reg_dx, Q;

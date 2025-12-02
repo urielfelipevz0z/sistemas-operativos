@@ -55,29 +55,34 @@ int aluGpo2(char *operacion, char *registro){
 
 int Gpo3(char *operacion, int *valores, PCB *proceso){  //GET o FRE, {1,2,3}, proceso
     if (strcmp("GET", operacion) == 0){
-        //Compara que los valores que solicita sean menores que los recursos globales 
-        if(valores[0] <= recursos[0] && valores[1] <= recursos[1] && valores[2] <= recursos[2]){
-            //Compara que los valores que solicita sean menores que los recursos Maximos solicitados al comienzo
-            if(valores[0] <= proceso->RMax[0] && valores[1] <= proceso->RMax[1] && valores[2] <= proceso->RMax[2]){
-                proceso->RAsig[0] += valores[0]; proceso->RAsig[1] += valores[1]; proceso->RAsig[2] += valores[2];
-                recursos[0] -= valores[0]; recursos[1] -= valores[1]; recursos[2] -= valores[2];
-            }
-            else{
-                //Solicita más recursos de los permitidos en MAX - terminar con error
-                strcpy(proceso->estado, "ERROR: GET > MAX");
-                liberarRecursos(proceso);   //Liberar recursos antes de terminar
-                return -2;  // Código especial para mover a terminados
-            }
+        // sprintf(desc, "recursos en cada get: %d %d %d", valores[0] + proceso->RAsig[0],valores[1] + proceso->RAsig[1] ,valores[2] + proceso->RAsig[2]);
+        // imprimirError(desc);
+        
+        // Compara que los valores que solicita junto con lo que ya tiene no excedan el limite del MAX
+        if(valores[0] + proceso->RAsig[0] > proceso->RMax[0] 
+        || valores[1]+ proceso->RAsig[1] > proceso->RMax[1] 
+        || valores[2] + proceso->RAsig[2] > proceso->RMax[2]){
+            strcpy(proceso->estado, "ERROR: GET > MAX");
+            liberarRecursos(proceso);
+            return -2;  // Mandar a terminados
+        }    
+        //Compara que los valores que solicita sean menores que los recursos globales
+        if(valores[0] > recursos[0] || valores[1] > recursos[1] || valores[2] > recursos[2]){
+            strcpy(proceso->estado, "BLOQUEADO (recursos)");
+                proceso->RGet[0] = valores[0];
+                proceso->RGet[1] = valores[1];
+                proceso->RGet[2] = valores[2];
+            return -3;  // Mandar a bloqueados
         }
-        else{
-            //No hay recursos disponibles - bloquear proceso
-            strcpy(proceso->estado, "BLOQUEADO por recursos");
-            // Guardar los valores solicitados para reintentar después
-            proceso->RGet[0] = valores[0];
-            proceso->RGet[1] = valores[1];
-            proceso->RGet[2] = valores[2];
-            return -3;  // Código especial para mover a bloqueados
-        }
+        proceso->RAsig[0] += valores[0]; 
+        proceso->RAsig[1] += valores[1]; 
+        proceso->RAsig[2] += valores[2];
+        
+        recursos[0] -= valores[0]; 
+        recursos[1] -= valores[1]; 
+        recursos[2] -= valores[2];
+        return 0;
+
     }else if (strcmp("FRE", operacion) == 0){
         // Validar que no intente liberar más de lo que tiene asignado
         if(valores[0] > proceso->RAsig[0] || valores[1] > proceso->RAsig[1] || valores[2] > proceso->RAsig[2]){
@@ -93,6 +98,48 @@ int Gpo3(char *operacion, int *valores, PCB *proceso){  //GET o FRE, {1,2,3}, pr
     }
     return 0;
 }
+
+// int Gpo3(char *operacion, int *valores, PCB *proceso){  //GET o FRE, {1,2,3}, proceso
+//     if (strcmp("GET", operacion) == 0){
+//         //Compara que los valores que solicita sean menores que los recursos globales 
+//         if(valores[0] <= recursos[0] && valores[1] <= recursos[1] && valores[2] <= recursos[2]){
+//             //Compara que los valores que solicita sean menores que los recursos Maximos solicitados al comienzo
+//             if(valores[0] + proceso->RAsig[0] <= proceso->RMax[0] && valores[1]+ proceso->RAsig[1] <= proceso->RMax[1] 
+//                 && valores[2] + proceso->RAsig[2] <= proceso->RMax[2]){
+//                 proceso->RAsig[0] += valores[0]; proceso->RAsig[1] += valores[1]; proceso->RAsig[2] += valores[2];
+//                 recursos[0] -= valores[0]; recursos[1] -= valores[1]; recursos[2] -= valores[2];
+//             }
+//             else{
+//                 //Solicita más recursos de los permitidos en MAX - terminar con error
+//                 strcpy(proceso->estado, "ERROR: GET > MAX");
+//                 liberarRecursos(proceso);   //Liberar recursos antes de terminar
+//                 return -2;  // Código especial para mover a terminados
+//             }
+//         }
+//         else{
+//             //No hay recursos disponibles - bloquear proceso
+//             strcpy(proceso->estado, "BLOQUEADO (recursos)");
+//             // Guardar los valores solicitados para reintentar después
+//             proceso->RGet[0] = valores[0];
+//             proceso->RGet[1] = valores[1];
+//             proceso->RGet[2] = valores[2];
+//             return -3;  // Código especial para mover a bloqueados
+//         }
+//     }else if (strcmp("FRE", operacion) == 0){
+//         // Validar que no intente liberar más de lo que tiene asignado
+//         if(valores[0] > proceso->RAsig[0] || valores[1] > proceso->RAsig[1] || valores[2] > proceso->RAsig[2]){
+//             strcpy(proceso->estado, "ERROR: FRE > RAsig");
+//             liberarRecursos(proceso);   //Liberar recursos antes de terminar
+//             return -2;  // Terminar con error
+//         }
+//         // Liberar recursos
+//         proceso->RAsig[0] -= valores[0]; proceso->RAsig[1] -= valores[1]; proceso->RAsig[2] -= valores[2];
+//         recursos[0] += valores[0]; recursos[1] += valores[1]; recursos[2] += valores[2];
+//         // Después de liberar recursos, revisar si se pueden desbloquear procesos
+//         planificadorMP();
+//     }
+//     return 0;
+// }
 
 int analizadorGpo1(char *tipo_operacion, char *operandos){     //MOV y Ax,7
     if (strchr(operandos, '.') != NULL){    //cadena[] = {'.','@','_','-',';',':','+','*','/','!'}

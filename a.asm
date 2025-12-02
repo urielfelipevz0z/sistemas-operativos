@@ -1,11 +1,12 @@
 MAX 10,10,10
-MOV Ax,5
-GET 1,2,7
 ADD Bx,7
-
-
+GET 5,5,5
+GET 5,5,5
+ADD Bx,7
 SUB Cx,4
 MUL Dx,2
+GET 1,2,4
+
 DIV Ax,2
 INC Ax
 DEC Cx

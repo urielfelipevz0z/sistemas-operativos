@@ -1,4 +1,5 @@
 #include "include/controlador.h"
+PCB *proceso;
 
 //Imprimir el cuadro de mensajes de errores
 void imprimirError(char *mensaje){
@@ -11,12 +12,10 @@ void imprimirError(char *mensaje){
 }
 
 void imprimirDebug(char *mensaje){
-    werase(ventana->ventana[1]);
-    box(ventana->ventana[1], 0, 0);
-    mvwprintw(ventana->ventana[1], 1, 1, "[DEBUG] %s", mensaje);
-    wrefresh(ventana->ventana[1]);
-    wmove(ventana->ventana[0], 1, 4);
-    wrefresh(ventana->ventana[0]);
+    werase(ventana->ventana[9]);
+    box(ventana->ventana[9], 0, 0);
+    mvwprintw(ventana->ventana[9], 1, 1, "[DEBUG] %s", mensaje);
+    wrefresh(ventana->ventana[9]);
 }
 
 void imprimirRecursos(char *mensaje){
@@ -39,23 +38,23 @@ void imprimirEncabezadoEjecucion(void){
     werase(ventana->ventana[2]);
     box(ventana->ventana[2], 0, 0);
     mvwprintw(ventana->ventana[2], 1, 1, "-----  EJECUCION  -----");
-    mvwprintw(ventana->ventana[2],2,1,"%-5s %-5s %-5s %-5s %-5s %-5s %-10s %-10s %s",
-           "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Proceso", "IR", "Status");
+    mvwprintw(ventana->ventana[2],2,1,"%-5s %-5s %-5s %-5s %-5s %-5s %-5s %-5s %-5s %-10s %-10s %s",
+           "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Rx", "Ry", "Rz", "Proceso", "IR", "Status");
     mvwprintw(ventana->ventana[2],3,1,"----------------------------------------------------------------------------------");
     wrefresh(ventana->ventana[2]);
 }
 
 void  imprimirFila(void){
-    mvwprintw(ventana->ventana[2],4,1,"%-5d %-5d %-5d %-5d %-5d %-5d %-10s %-10s %s",
-           reg_id, reg_pc, reg_ax, reg_bx, reg_cx, reg_dx, 
+    mvwprintw(ventana->ventana[2],4,1,"%-5d %-5d %-5d %-5d %-5d %-5d %-5d %-5d %-5d %-10s %-10s %s",
+           reg_id, reg_pc, reg_ax, reg_bx, reg_cx, reg_dx, arreglo_de_listas[1]->RAsig[0], arreglo_de_listas[1]->RAsig[1], arreglo_de_listas[1]->RAsig[2],
            reg_proceso, reg_ir, "Correcto");
     wrefresh(ventana->ventana[2]);
     usleep(tiempo);
 }
 
 void imprimirFilaConError(char *mensaje_error){
-    mvwprintw(ventana->ventana[2],4,1,"%-5d %-5d %-5d %-5d %-5d %-5d %-10s %-10s %s",
-           reg_id, reg_pc, reg_ax, reg_bx, reg_cx, reg_dx, 
+    mvwprintw(ventana->ventana[2],4,1,"%-5d %-5d %-5d %-5d %-5d %-5d %-5d %-5d %-5d %-10s %-10s %s",
+           reg_id, reg_pc, reg_ax, reg_bx, reg_cx, reg_dx, arreglo_de_listas[1]->RAsig[0], arreglo_de_listas[1]->RAsig[1], arreglo_de_listas[1]->RAsig[2],
            reg_proceso, reg_ir, mensaje_error);
     wrefresh(ventana->ventana[2]);
     usleep(tiempo);
@@ -68,15 +67,16 @@ void imprimirTabla(void){
 
 void inicializarVentanas(Ventana *ventana){
 
-    ventana->ventana[0] = newwin(3,152,0,0);      //Promt
-    ventana->ventana[1] = newwin(3,87,3,65);      //Mensajes de error/debug
-    ventana->ventana[2] = newwin(7,87,14,65);     //Lista de Ejecucion (7 filas)
-    ventana->ventana[3] = newwin(8,87,6,65);      //Lista de Listos (8 filas = 4 procesos)
-    ventana->ventana[4] = newwin(16,87,21,65);    //Lista de Terminados (16 filas = 12 procesos)
-    ventana->ventana[5] = newwin(15,65,6,0);      //Lista de Nuevos (15 filas = 11 procesos)
-    ventana->ventana[6] = newwin(3,65,3,0);       //Mensajes quantum
-    ventana->ventana[7] = newwin(16,65,21,0);     //Lista de Bloqueados (16 filas = 12 procesos)
-    ventana->ventana[8] = newwin(3,152,37,0);     //Recursos globales
+    ventana->ventana[0] = newwin(3,110,0,5);      //Promt
+    ventana->ventana[1] = newwin(3,92,3,68);      //Mensajes de error
+    ventana->ventana[2] = newwin(7,92,14,68);     //Lista de Ejecucion (7 filas)
+    ventana->ventana[3] = newwin(8,92,6,68);      //Lista de Listos (8 filas = 4 procesos)
+    ventana->ventana[4] = newwin(16,92,21,68);    //Lista de Terminados (16 filas = 12 procesos)
+    ventana->ventana[5] = newwin(15,68,6,0);      //Lista de Nuevos (15 filas = 11 procesos)
+    ventana->ventana[6] = newwin(3,68,3,0);       //Mensajes quantum
+    ventana->ventana[7] = newwin(16,68,21,0);     //Lista de Bloqueados (16 filas = 12 procesos)
+    ventana->ventana[8] = newwin(3,30,0,120);     //Recursos globales
+    ventana->ventana[9] = newwin(3,160,37,0);
     ventana->update[0] = 1;
     ventana->update[1] = 1;
     ventana->update[2] = 1;
@@ -86,6 +86,7 @@ void inicializarVentanas(Ventana *ventana){
     ventana->update[6] = 1;
     ventana->update[7] = 1;
     ventana->update[8] = 1;
+    ventana->update[9] = 1;
 }
 
 void imprimirVentanas(Ventana *ventana){
@@ -98,6 +99,7 @@ void imprimirVentanas(Ventana *ventana){
     ventanaQuantum(ventana);
     ventanaBloqueados(ventana);
     ventanaRecursos(ventana);
+    ventanaDebug(ventana);
 }
 
 void ventanaPromt(Ventana *ventana){
@@ -114,6 +116,14 @@ void ventanaMensaje(Ventana *ventana){
     box(ventana->ventana[1],0,0);    
     ventana->update[1] = 0;                         //ponemos el estado en ya actualizado
     wrefresh(ventana->ventana[1]);                  //Refresca la ventana para mostrar el borde
+}
+
+void ventanaDebug(Ventana *ventana){
+    werase(ventana->ventana[9]);
+    mvwprintw(ventana->ventana[9], 1, 1, "Debug: ");
+    box(ventana->ventana[9],0,0);    
+    ventana->update[9] = 0;                         //ponemos el estado en ya actualizado
+    wrefresh(ventana->ventana[9]);                  //Refresca la ventana para mostrar el borde
 }
 
 void ventanaEjecucion(Ventana *ventana){

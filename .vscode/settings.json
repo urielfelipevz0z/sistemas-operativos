@@ -11,6 +11,14 @@
         "proceso.h": "c",
         "cpu.h": "c",
         "interfaz.h": "c",
-        "entrada.h": "c"
+        "entrada.h": "c",
+        "cctype": "c",
+        "clocale": "c",
+        "cmath": "c",
+        "cstdio": "c",
+        "cstdlib": "c",
+        "cwchar": "c",
+        "cwctype": "c",
+        "memory_resource": "c"
     }
 }

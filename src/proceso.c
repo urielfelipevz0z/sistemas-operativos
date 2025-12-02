@@ -272,18 +272,18 @@ void recorrerListas(PCB *arreglo_de_listas[]){
         j = 0;
         if(i == 0){ //lista de listos (Ventana 87 chars)
             lista = arreglo_de_listas[i];
-            werase(ventana->ventana[3]);
+            werase(ventana->ventana[3]);    
             box(ventana->ventana[3], 0, 0);
             mvwprintw(ventana->ventana[3], 1, 1, "-----  LISTOS  -----");
-            mvwprintw(ventana->ventana[3],2,1,"%-3s %-3s %-4s %-4s %-4s %-4s %-5s %-12s %-12s %-18s",
-                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Prior", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[3],2,1,"%-3s %-3s %-4s %-4s %-4s %-4s %-4s %-4s %-4s %-5s %-12s %-11s %-16s",
+                "ID", "PC", "Ax", "Bx", "Cx", "Dx", "Rx", "Ry", "Rz", "Prior", "Proceso", "IR", "Status");
             mvwprintw(ventana->ventana[3],3,1,"--------------------------------------------------------------------------------");
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[3], j+4, 1, "%-3d %-3d %-4d %-4d %-4d %-4d %-5d %-12s %-12s %-18s",
-                    aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx, aux->prioridad,
-                    aux->nombre, aux->ir, aux->estado);
+                mvwprintw(ventana->ventana[3], j+4, 1, "%-3d %-3d %-4d %-4d %-4d %-4d %-4d %-4d %-4d %-5d %-12s %-11s %-16s",
+                    aux->id, aux->pc, aux->ax, aux->bx, aux->cx, aux->dx, aux->RAsig[0], aux->RAsig[1], aux->RAsig[2],
+                    aux->prioridad,aux->nombre, aux->ir, aux->estado);
                 j++;
             }
             wrefresh(ventana->ventana[3]);
@@ -332,15 +332,16 @@ void recorrerListas(PCB *arreglo_de_listas[]){
             werase(ventana->ventana[7]);
             box(ventana->ventana[7], 0, 0);
             mvwprintw(ventana->ventana[7], 1, 1, "----- BLOQUEADOS -----");
-            mvwprintw(ventana->ventana[7],2,1,"%-4s %-4s %-6s %-12s %-12s %-16s",
-                "ID", "PC", "Prior", "Proceso", "IR", "Status");
+            mvwprintw(ventana->ventana[7],2,1,"%-3s %-3s %-4s %-3s %-3s %-3s %-8s %-10s %-16s",
+                "ID", "PC", "Prior", "Rx", "Ry", "Rz", "Proceso", "IR", "Status");
             mvwprintw(ventana->ventana[7],3,1,"-------------------------------------------------------------");
             j = 0;
             while(lista != NULL){
                 aux = lista;
                 lista = lista->siguiente;
-                mvwprintw(ventana->ventana[7], j+4, 1, "%-4d %-4d %-6d %-12s %-12s %-16s",
-                    aux->id, aux->pc, aux->prioridad, aux->nombre, aux->ir, aux->estado);
+                mvwprintw(ventana->ventana[7], j+4, 1, "%-3d %-3d %-4d %-3d %-3d %-3d %-8s %-10s %-16s",
+                    aux->id, aux->pc, aux->prioridad, aux->RAsig[0], aux->RAsig[1], aux->RAsig[2],   
+                    aux->nombre, aux->ir, aux->estado);
                 j++;
             }
             wrefresh(ventana->ventana[7]);
@@ -365,8 +366,9 @@ int ejecutarInstruccion(FILE *archivo){
     if(archivo == NULL){
         return 1;
     }
-
     imprimirTabla();
+    long posicion_actual = ftell(archivo);
+
     if (fgets(linea, sizeof(linea), archivo) != NULL){   //linea = MOV Ax,7 o INC Ax
         bandera = 0;
         linea[strcspn(linea, "\n")] = 0;
@@ -398,7 +400,7 @@ int ejecutarInstruccion(FILE *archivo){
         if (operandos == NULL){
             imprimirFilaConError("Cantidad incorrecta de operandos");
             strcpy(reg_estado, "ERROR DE SINTAXIS");
-            return -1;
+            return 1;
         }
 
         if (tipo_op == 1){
@@ -406,14 +408,14 @@ int ejecutarInstruccion(FILE *archivo){
                 bandera = 1;
                 strcpy(reg_estado, "ERROR DE SINTAXIS");
                 reg_pc++;
-                return -1;
+                return 1;
             }  
         } else if (tipo_op == 2){
             if(analizadorGpo2(token, operandos)){ 
                 bandera = 1;
                 strcpy(reg_estado, "ERROR DE SINTAXIS");
                 reg_pc++;
-                return -1;
+                return 1;
             }  
         } else if (tipo_op == 3){
             int res = analizadorGpo3(token, operandos, arreglo_de_listas[1]);
@@ -427,17 +429,18 @@ int ejecutarInstruccion(FILE *archivo){
                 // Recursos insuficientes - bloquear proceso
                 bandera = 1;
                 strcpy(reg_estado, arreglo_de_listas[1]->estado);
+                fseek(archivo, posicion_actual, SEEK_SET);
                 return 2;  // Retornar 2 para bloquear el proceso
             } else if(res != 0){
                 bandera = 1;
                 strcpy(reg_estado, "ERROR DE SINTAXIS");
                 reg_pc++;
-                return -1;
+                return 1;
             }  
         } 
         else{
             imprimirFilaConError("Instrucción no reconocida");
-            return -1;
+            return 1;
         }
         return 0;
     }
@@ -501,11 +504,14 @@ int MaxRecursos(PCB* aux){
 
 int planificadorLP(){
     PCB *aux;
-    
     while(arreglo_de_listas[3] != NULL){
+        
         aux = arreglo_de_listas[3];
         arreglo_de_listas[3] = aux->siguiente;
+
         aux->siguiente = NULL;
+        // sprintf(desc,"DEBUG: Intentando procesar PCB en dirección %s\n", aux->nombre);
+        // imprimirDebug(desc);
 
         if(Max(aux) == 1){ // Existe la instruccion MAX
             if(MaxRecursos(aux) == -1){   //Salio mal
@@ -513,33 +519,12 @@ int planificadorLP(){
             }
         }
         else{ //Si no exite la instruccion MAX insertar en Terminados
+            sprintf(desc, "Alcance a entrar para verificar el max");
+            imprimirDebug(desc);
             insertar(&(arreglo_de_listas[2]), aux);
             recorrerListas(&(arreglo_de_listas[0]));
         }
-
     }
-
-
-
-
-
-    // while(arreglo_de_listas[3] != NULL){   //Si hay algo en Nuevos y espacio en listos Guardar en Listos
-    //     aux = arreglo_de_listas[3];         
-    //     arreglo_de_listas[3] = aux->siguiente;
-    //     aux->siguiente = NULL;
-    //     //Comprobar que exista la instruccion MAX
-    //     if(Max(aux) == 1){ // todo good
-    //         MaxRecursos(aux);
-    //     }
-    //     else{ //Si no exite la instruccion MAX insertar en Terminados
-    //         insertar(&(arreglo_de_listas[2]), aux);
-    //         recorrerListas(&(arreglo_de_listas[0]));
-    //     }
-    // }
-    // if(mov){
-    //     recorrerListas(&(arreglo_de_listas[0]));
-    // }
-    // return mov;
     return 0;
 }
 
@@ -592,6 +577,7 @@ int planificadorMP(){
 int Max(PCB* proceso){
     char linea[TAMANIO_COMANDO];
     if (fgets(linea, sizeof(linea), proceso->archivo) != NULL){   //linea = MAX 1,2,3
+    
         linea[strcspn(linea, "\n")] = 0;
         
         char copia[TAMANIO_LINEA];
@@ -603,7 +589,8 @@ int Max(PCB* proceso){
         }
 
         if(strcmp("MAX", token) == 0){
-        char *operandos;
+            
+            char *operandos;
             for(int i = 0; i < 3; i++){
             operandos = strtok(NULL, ",");     //1 luego 2 luego 3
                 if(!esNumeroValido(operandos)){
@@ -614,52 +601,17 @@ int Max(PCB* proceso){
                 }
                 proceso->RMax[i] = atoi(operandos);
             }
+            return 1;
         }
         else{
-            imprimirFilaConError("No MAX");
+            
+            //imprimirFilaConError("No MAX");
+            
             strcpy(proceso->ir, linea);
-            strcpy(proceso->estado, "ERROR DE RECURSOS");
+            strcpy(proceso->estado, "No se encontro MAX");
+            
             return -1;
         }
     }
-    return 1;
-}
-
-int Get(char *linea){       //GET 1,2,3
-    PCB *aux = arreglo_de_listas[1];
-    int get[3]= {0,0,0};
-
-    char copia[TAMANIO_LINEA];
-    strcpy(copia, linea);
-    char *token = strtok(copia, " ");       //token = GET
-    
-    if (token == NULL){
-        return 0;
-    }
-
-    if(strcmp("GET", token) == 0){      //GET 1,2,3  despues de la suma Asig <= Globales
-    char *operandos;
-        for(int i = 0; i < 3; i++){
-        operandos = strtok(NULL, ",");     //1 luego 2 luego 3
-            if(!esNumeroValido(operandos)){
-                imprimirFilaConError("Uso incorrecto de valores");
-                strcpy(aux->ir, linea);
-                strcpy(aux->estado, "ERROR DE RECURSOS");
-                return -1;
-            }
-            get[i] = atoi(operandos);   // {1,2,3}
-        }
-        if(get[0] <= recursos[0] && get[1] <= recursos[1] && get[2] <= recursos[2]){
-            aux->RAsig[0] += get[0]; aux->RAsig[1] += get[1]; aux->RAsig[2] += get[2];
-            recursos[0] -= get[0]; recursos[1] -= get[1]; recursos[2] -= get[2];
-        }
-        else{
-            insertar(&(arreglo_de_listas[4]), aux);       //Se inserta en la lista de bloqueados
-        }
-
-    }
     return 0;
 }
-
-
-

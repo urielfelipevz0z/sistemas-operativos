@@ -133,7 +133,7 @@ void killProceso(PCB *arreglo_de_listas[], int valor) {
     PCB *actual;
 
     // Buscar en la lista de listos (0) y en ejecución (1)
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 5; i++) {
         if(i == 2){
             continue;
         }
@@ -150,6 +150,8 @@ void killProceso(PCB *arreglo_de_listas[], int valor) {
                 actual->siguiente = NULL;
                 strcpy(actual->estado, "Terminado por KILL");
                 liberarRecursos(actual);   //Liberar recursos antes de terminar
+                sprintf(desc, "Recursos-> X:%d Y:%d Z:%d", recursos[0],recursos[1],recursos[2]);
+                imprimirRecursos(desc);
                 insertar(&(arreglo_de_listas[2]), actual);
                 cant_procesos --;
                 return;

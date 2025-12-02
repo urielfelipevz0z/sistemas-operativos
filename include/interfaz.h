@@ -24,5 +24,6 @@ void ventanaNuevos(Ventana *ventana);
 void ventanaQuantum(Ventana *ventana);
 void ventanaBloqueados(Ventana *ventana);
 void ventanaRecursos(Ventana *ventana);
+void ventanaDebug(Ventana *ventana);
 
 #endif

@@ -1,22 +1,32 @@
-duda número 1: ¿El profe es humano?
+Duda número 1: ¿El profe es humano?
 
-1.- Leer instruccion MAX 1,2,3, si no existe mandar a terminados con status "Error de recursos" ✅
-2.- X,Y,Z variables globales ✅
-2.1.- ✅
-3.- Instruccion GET 1,0,3 (Realizar resta a las var globales)
-4.- Nueva lista "Bloqueados"
-5.- Nueva instruccion FRE 1,2,3
+1.- Quitar el limite a la lista de listos ✅
 
+2.- Leer instruccion MAX 1,2,3, si no existe mandar a terminados con status "Error de recursos" 
 
+3.- Implemntar nuevas variables globales X,Y,Z  ✅
 
-#.- Nuevas variables para el PCB RMax_x,RMax_y,RMax_z asi como RAsig_x,RAsig_y,RAsig_z
-#.- Quitar el limite de la lista de listos
+4.- Nueva instrucción GET 1,0,3 (Realizar resta a las var globales) ✅
+ 4.1- La instruccion Get se puede ejecutar multiples veces a lo largo del proceso, 
+      esto hasta llegar al maximo de de recuersos solicitados "MAX 1,2,3" ✅
 
+5.- Nueva lista "Bloqueados", cuyos procesos soliciten recursos y el SO no los tenga de momento ✅
 
+6.- Nueva instruccion FRE 1,2,3, esta instruccion libera estos recursos(se sumara estas unidades a las variables globales) ✅
 
+7.- Si la instruccion MAX excede a las variables globales se manda a terminados con estatus status "Error de recursos" ✅
 
+8.- Si la instruccion MAX no excede las variables globales se manda a listos ✅
 
+9.- Los GET se leen en ejecucion cada que se lea un  GET y no alcancen los recursos se manda a Bloqueados ✅
+ 9.1-Cada que le aun FRE revisar la lista de Bloqueados 
 
+10.- La suma de todos los GET deben de ser igual o menor al MAX del proceso. el FRE no necesariamente. ✅
 
+11.- Los recursos se liberan con FRE, KILL, al finalizar el procesos con o sin END, asi como con instrucciones invalidas ✅
 
+12.- Nueva ventana para los recursos globales ✅
 
+13.- Agregar la impresión de los recursos de los procesos en ejecución ✅
+
+14.- Nuevas variables para el PCB RMax_x,RMax_y,RMax_z asi como RAsig_x,RAsig_y,RAsig_z ✅
