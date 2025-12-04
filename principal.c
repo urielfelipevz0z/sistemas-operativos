@@ -15,6 +15,7 @@
  *  ejecuta a.asm c.asm b.asm a.asm a.asm c.asm b.asm a.asm
  *  ejecuta si.asm b.asm b.asm a.asm si.asm
  *  ejecuta no.asm c.asm si.asm no.asm no.asm no.asm si.asm si.asm no.asm no.asm
+ *  ejecuta d.asm f.asm g.asm a.asm b.asm si.asm err.asm 
  * 
  * 
  * 

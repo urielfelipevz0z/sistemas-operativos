@@ -1,5 +1,9 @@
 #include "include/controlador.h"
 
+void breake(){
+    return;
+}
+
 void gestorProcesos(char *argumento, PCB *arreglo_de_listas[]){
     PCB *nuevo;
     char arg_copia[256];
@@ -162,11 +166,11 @@ int manejador(){
                 liberarRecursos(aux);   //Liberar recursos antes de terminar
                 insertar(&(arreglo_de_listas[2]), aux); //Se manda a terminados
                 cant_procesos--;
-                recorrerListas(&(arreglo_de_listas[0]));
                 if(bandera == 0){
                     sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
                     imprimirError(desc);
-                    strcpy(reg_estado, "ERROR");
+                    strcpy(reg_estado, "ERROR: END");
+                    strcpy(aux->estado, "ERROR: END");
                 }
                 imprimirEncabezadoEjecucion();
                 return 1;
@@ -192,7 +196,8 @@ int manejador(){
                 if(bandera == 0){
                     sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
                     imprimirError(desc);
-                    strcpy(reg_estado, "ERROR");
+                    strcpy(reg_estado, "ERROR: END");
+                    strcpy(aux->estado, "ERROR: END");
                 }
                 imprimirEncabezadoEjecucion();
                 return 1;   //Si se termina el proceso termina el ciclo FOR Q
@@ -227,7 +232,8 @@ int manejador(){
             if(bandera == 0){
                 sprintf(desc, "[WARNING] Finalizo pero no se encontró la instruccion END en el archivo %s", reg_proceso);
                 imprimirError(desc);
-                strcpy(reg_estado, "ERROR");
+                strcpy(reg_estado, "ERROR: END");
+                strcpy(aux->estado, "ERROR: END");
             }
             imprimirEncabezadoEjecucion();            
             return 1;       //Si se termina el proceso termina el ciclo FOR Q

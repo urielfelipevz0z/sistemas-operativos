@@ -178,5 +178,35 @@ if (strcmp("END", token) == 0){
 
 
 
+gdb
 
+
+Los comandos útiles de GDB incluyen run para iniciar el programa, break y continue para controlar la ejecución, next y step para avanzar en el código, print y info para inspeccionar variables y quit para salir del depurador. También se usan backtrace (o bt) para ver el historial de llamadas, list para ver el código fuente y x para examinar la memoria. 
+
+Comandos de ejecución y control
+
+run (r): Inicia la ejecución del programa.
+continue (c): Continúa la ejecución hasta el siguiente punto de interrupción o error.
+next (n): Ejecuta la siguiente línea, pero no entra en funciones.
+step (s): Ejecuta la siguiente instrucción y entra en funciones si es necesario.
+finish (f): Continúa la ejecución hasta que termine la función actual.
+quit (q): Sale de GDB. 
+
+Comandos para puntos de interrupción
+break <punto> (b): Establece un punto de interrupción. Puede ser en una línea (b 10), una función (b main) o una línea relativa (b +5).
+info breakpoints (info break): Muestra una lista de todos los puntos de interrupción.
+delete <n> (d <n>): Elimina el punto de interrupción número n. 
+
+Comandos de inspección
+print <variable> (p <variable>): Muestra el valor de una variable.
+info locals: Muestra las variables locales de la función actual.
+info args: Muestra los argumentos de la función actual.
+backtrace (bt): Imprime el historial de la pila de llamadas de la función.
+x/ <addr: Examina la memoria en una dirección específica. Por ejemplo, x/4xw 0x... muestra cuatro palabras en hexadecimal. 
+
+Comandos de ayuda y navegación
+help <comando>: Muestra ayuda detallada sobre un comando. Por ejemplo, help c.
+list (l): Muestra el código fuente alrededor de la línea actual.
+up (u): Sube un nivel en la pila de llamadas.
+down (d): Baja un nivel en la pila de llamadas. 
 

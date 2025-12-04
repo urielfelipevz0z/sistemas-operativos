@@ -24,4 +24,8 @@ int quantum();
 int planificadorLP();
 int planificadorMP();
 
+
+
+void breake();
+
 #endif
