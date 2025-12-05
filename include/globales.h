@@ -36,6 +36,10 @@ typedef struct pcb{
     int RAsig[3];
     int RGet[3];  // Último GET que causó bloqueo (para reintentar)
 
+    int lineas;     //Numero de lineas totales del archivo
+    int paginas;    //Numero de paginas 1 pagina = 4 Lineas
+    int TMP[];      //Sepa
+
 }PCB;
 
 typedef struct ventana{

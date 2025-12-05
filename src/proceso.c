@@ -29,6 +29,7 @@ void gestorProcesos(char *argumento, PCB *arreglo_de_listas[]){
 }
 
 PCB *crear(char *proceso){
+    char linea[TAMANIO_LINEA];
     PCB *nuevo = (PCB *)malloc(sizeof(PCB));
     if(nuevo == NULL){
         imprimirError("No se ha podido crear el proceso\n");
@@ -41,6 +42,27 @@ PCB *crear(char *proceso){
         return NULL;
     }
     nuevo->archivo = f;
+
+    //Seteamos las lineas en -1 para que el MAX no cuente
+    nuevo->lineas = -1;
+    //Recorremos todo el archivo para contar las lineas y las paginas
+    while(fgets(linea, sizeof(linea), nuevo->archivo) != NULL){
+        if(strcmp(linea,"\n") == 0){
+            continue;
+        }
+        nuevo->lineas++;
+        if(nuevo->lineas % 4 == 0){
+            nuevo->paginas++;
+        }
+    }
+    //Reiniciamos el apuntador del archivo
+    fseek(nuevo->archivo, 0, SEEK_SET);
+    //Le damos tamaño al arreglo TMP
+    nuevo->TMP[nuevo->paginas];
+
+    sprintf(desc,"DEBUG: Lineas = %d, Paginas = %d\n", nuevo->lineas, nuevo->paginas);
+    imprimirDebug(desc);
+    
 
     id_listos++;
     nuevo->id = id_listos;
@@ -516,8 +538,6 @@ int planificadorLP(){
         arreglo_de_listas[3] = aux->siguiente;
 
         aux->siguiente = NULL;
-        // sprintf(desc,"DEBUG: Intentando procesar PCB en dirección %s\n", aux->nombre);
-        // imprimirDebug(desc);
 
         if(Max(aux) == 1){ // Existe la instruccion MAX
             if(MaxRecursos(aux) == -1){   //Salio mal
@@ -525,8 +545,8 @@ int planificadorLP(){
             }
         }
         else{ //Si no exite la instruccion MAX insertar en Terminados
-            sprintf(desc, "Alcance a entrar para verificar el max");
-            imprimirDebug(desc);
+            // sprintf(desc, "Alcance a entrar para verificar el max");
+            // imprimirDebug(desc);
             insertar(&(arreglo_de_listas[2]), aux);
             recorrerListas(&(arreglo_de_listas[0]));
         }
